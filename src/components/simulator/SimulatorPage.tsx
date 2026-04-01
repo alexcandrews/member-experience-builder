@@ -25,7 +25,7 @@ export default function SimulatorPage({ plan }: SimulatorPageProps) {
         <p>Advance the date to preview how your plan unfolds for members</p>
       </div>
 
-      {!plan.config.startDate && (
+      {!plan.config.startsAt && (
         <div className="simulator-warning">
           ⚠ No plan start date set. Open <strong>Configure</strong> in the Builder to set one.
         </div>

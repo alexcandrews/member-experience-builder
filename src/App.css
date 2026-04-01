@@ -65,6 +65,39 @@
   border-bottom-color: #e91e8c;
 }
 
+/* ─── Toolbar (Import / Export) ───────────────────────────────────────────── */
+.app-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.toolbar-btn {
+  background: none;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  color: #555;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.toolbar-btn:hover {
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+.toolbar-error {
+  color: #c0392b;
+  font-size: 12px;
+}
+
 /* ─── Builder page ────────────────────────────────────────────────────────── */
 .builder-page {
   display: flex;

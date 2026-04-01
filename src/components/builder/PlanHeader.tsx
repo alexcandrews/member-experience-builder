@@ -26,28 +26,24 @@ export default function PlanHeader({
   const [editingTitle, setEditingTitle] = useState(false);
 
   const handleTitleChange = (value: string) => {
-    updatePlan((prev) => ({ ...prev, title: value }));
+    updatePlan((prev) => ({ ...prev, name: value }));
   };
 
   const handleAddMilestone = () => {
     const newMilestone: Milestone = {
       id: crypto.randomUUID(),
-      title: 'New Milestone',
-      type: 'chapter',
+      name: 'New Milestone',
+      milestoneType: 'chapter',
       optional: false,
       activities: [],
-      resources: [],
     };
     updatePlan((prev) => ({ ...prev, milestones: [...prev.milestones, newMilestone] }));
     onSelectMilestone(newMilestone.id);
   };
 
-  // A milestone is "locked" for display purposes if it's not the first and
-  // the current date hasn't passed its unlock time. For the builder we simply
-  // show all as available but render the lock icon if unlocksAt is in the future.
   const now = new Date();
   const isLocked = (m: Milestone) =>
-    m.unlocksAt != null && m.unlocksAt.getTime() > now.getTime();
+    m.unlockAt != null && m.unlockAt.getTime() > now.getTime();
 
   return (
     <div className="plan-header">
@@ -59,14 +55,14 @@ export default function PlanHeader({
               <input
                 className="plan-title-input"
                 autoFocus
-                value={plan.title}
+                value={plan.name}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 onBlur={() => setEditingTitle(false)}
                 onKeyDown={(e) => e.key === 'Enter' && setEditingTitle(false)}
               />
             ) : (
               <h1 className="plan-title" onClick={() => setEditingTitle(true)} title="Click to edit">
-                {plan.title || 'Untitled Plan'}
+                {plan.name || 'Untitled Plan'}
               </h1>
             )}
           </div>

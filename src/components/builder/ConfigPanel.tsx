@@ -1,4 +1,4 @@
-import type { CommRule, CommRuleType, PlanConfig } from '../../types';
+import type { CommRule, CommRuleType, PlanConfig, UnlockStrategy } from '../../types';
 import { dateToLocalISO, localISOToDate } from '../../utils/dateHelpers';
 import '../../styles/config.css';
 
@@ -8,11 +8,11 @@ interface ConfigPanelProps {
   onClose: () => void;
 }
 
-const STRATEGY_LABELS: Record<PlanConfig['unlockStrategy'], string> = {
+const STRATEGY_LABELS: Record<UnlockStrategy, string> = {
   by_completion: 'By Completion — all preceding required milestones completed',
-  by_time: 'By Time — milestone Unlock At time has passed',
-  by_both: 'By Both — completion AND Unlock At time (default)',
-  by_either: 'By Either — completion OR Unlock At time',
+  by_unlock_at_time: 'By Time — milestone Unlock At time has passed',
+  by_completion_and_unlock_at_time: 'By Both — completion AND Unlock At time (default)',
+  by_completion_or_unlock_at_time: 'By Either — completion OR Unlock At time',
 };
 
 const COMM_RULE_LABELS: Record<CommRuleType, string> = {
@@ -35,13 +35,26 @@ const OFFSET_TYPES: CommRuleType[] = ['milestone_reminder', 'session_reminder', 
 const TOGGLE_TYPES: CommRuleType[] = ['start_of_plan', 'end_of_plan'];
 
 export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelProps) {
-  const hasRule = (type: CommRuleType) => config.commRules.some((r) => r.type === type);
+  const hasRule = (type: CommRuleType) =>
+    config.commRules.some((r) => r.triggerType === type && r.enabled);
 
   const toggleRule = (type: CommRuleType) => {
-    if (hasRule(type)) {
-      onUpdate({ ...config, commRules: config.commRules.filter((r) => r.type !== type) });
+    const existing = config.commRules.find((r) => r.triggerType === type);
+    if (existing) {
+      // Toggle enabled flag
+      onUpdate({
+        ...config,
+        commRules: config.commRules.map((r) =>
+          r.triggerType === type ? { ...r, enabled: !r.enabled } : r,
+        ),
+      });
     } else {
-      const newRule: CommRule = { id: crypto.randomUUID(), type };
+      const newRule: CommRule = {
+        id: crypto.randomUUID(),
+        name: COMM_RULE_LABELS[type],
+        triggerType: type,
+        enabled: true,
+      };
       onUpdate({ ...config, commRules: [...config.commRules, newRule] });
     }
   };
@@ -49,14 +62,20 @@ export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelPr
   const addOffsetRule = (type: CommRuleType) => {
     const defaultOffset =
       type === 'session_reminder' ? -1440 : type === 'session_followup' ? 60 : 1440;
-    const newRule: CommRule = { id: crypto.randomUUID(), type, minuteOffset: defaultOffset };
+    const newRule: CommRule = {
+      id: crypto.randomUUID(),
+      name: COMM_RULE_LABELS[type],
+      triggerType: type,
+      enabled: true,
+      triggerOffsetMinutes: defaultOffset,
+    };
     onUpdate({ ...config, commRules: [...config.commRules, newRule] });
   };
 
-  const updateRuleOffset = (id: string, minuteOffset: number) => {
+  const updateRuleOffset = (id: string, triggerOffsetMinutes: number) => {
     onUpdate({
       ...config,
-      commRules: config.commRules.map((r) => (r.id === id ? { ...r, minuteOffset } : r)),
+      commRules: config.commRules.map((r) => (r.id === id ? { ...r, triggerOffsetMinutes } : r)),
     });
   };
 
@@ -86,11 +105,11 @@ export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelPr
                 onChange={(e) =>
                   onUpdate({
                     ...config,
-                    unlockStrategy: e.target.value as PlanConfig['unlockStrategy'],
+                    unlockStrategy: e.target.value as UnlockStrategy,
                   })
                 }
               >
-                {(Object.keys(STRATEGY_LABELS) as PlanConfig['unlockStrategy'][]).map((key) => (
+                {(Object.keys(STRATEGY_LABELS) as UnlockStrategy[]).map((key) => (
                   <option key={key} value={key}>
                     {STRATEGY_LABELS[key]}
                   </option>
@@ -109,9 +128,9 @@ export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelPr
               <input
                 className="config-datetime"
                 type="datetime-local"
-                value={config.startDate ? dateToLocalISO(config.startDate) : ''}
+                value={config.startsAt ? dateToLocalISO(config.startsAt) : ''}
                 onChange={(e) =>
-                  onUpdate({ ...config, startDate: localISOToDate(e.target.value) })
+                  onUpdate({ ...config, startsAt: localISOToDate(e.target.value) })
                 }
               />
             </div>
@@ -121,12 +140,17 @@ export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelPr
                 className="config-datetime"
                 type="datetime-local"
                 value={
-                  config.registrationStartDate ? dateToLocalISO(config.registrationStartDate) : ''
+                  config.registrationPeriod.opensAt
+                    ? dateToLocalISO(config.registrationPeriod.opensAt)
+                    : ''
                 }
                 onChange={(e) =>
                   onUpdate({
                     ...config,
-                    registrationStartDate: localISOToDate(e.target.value),
+                    registrationPeriod: {
+                      ...config.registrationPeriod,
+                      opensAt: localISOToDate(e.target.value),
+                    },
                   })
                 }
               />
@@ -137,12 +161,17 @@ export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelPr
                 className="config-datetime"
                 type="datetime-local"
                 value={
-                  config.registrationEndDate ? dateToLocalISO(config.registrationEndDate) : ''
+                  config.registrationPeriod.closesAt
+                    ? dateToLocalISO(config.registrationPeriod.closesAt)
+                    : ''
                 }
                 onChange={(e) =>
                   onUpdate({
                     ...config,
-                    registrationEndDate: localISOToDate(e.target.value),
+                    registrationPeriod: {
+                      ...config.registrationPeriod,
+                      closesAt: localISOToDate(e.target.value),
+                    },
                   })
                 }
               />
@@ -174,15 +203,13 @@ export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelPr
 
             {/* Offset-type rules */}
             {OFFSET_TYPES.map((type) => {
-              const rules = config.commRules.filter((r) => r.type === type);
+              const rules = config.commRules.filter((r) => r.triggerType === type);
               return (
                 <div key={type} className="comm-rule-group">
                   <div className="comm-rule-group-label">
                     <strong>{COMM_RULE_LABELS[type]}</strong>
                   </div>
-                  <p
-                    style={{ fontSize: 12, color: '#999', margin: '0 0 6px' }}
-                  >
+                  <p style={{ fontSize: 12, color: '#999', margin: '0 0 6px' }}>
                     {COMM_RULE_HINTS[type]}
                   </p>
                   {rules.map((rule) => (
@@ -191,14 +218,14 @@ export default function ConfigPanel({ config, onUpdate, onClose }: ConfigPanelPr
                       <input
                         className="comm-offset-input"
                         type="number"
-                        value={rule.minuteOffset ?? 0}
+                        value={rule.triggerOffsetMinutes ?? 0}
                         onChange={(e) => updateRuleOffset(rule.id, Number(e.target.value))}
                       />
                       <span className="comm-offset-hint">
-                        {rule.minuteOffset != null && rule.minuteOffset !== 0
-                          ? rule.minuteOffset > 0
-                            ? `+${rule.minuteOffset / 60}h after`
-                            : `${Math.abs(rule.minuteOffset) / 60}h before`
+                        {rule.triggerOffsetMinutes != null && rule.triggerOffsetMinutes !== 0
+                          ? rule.triggerOffsetMinutes > 0
+                            ? `+${rule.triggerOffsetMinutes / 60}h after`
+                            : `${Math.abs(rule.triggerOffsetMinutes) / 60}h before`
                           : 'at the moment'}
                       </span>
                       <button className="comm-rule-delete" onClick={() => deleteRule(rule.id)}>

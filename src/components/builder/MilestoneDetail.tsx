@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import type { Activity, Milestone, Resource } from '../../types';
+import type { Activity, Milestone } from '../../types';
 import { dateToLocalISO, localISOToDate } from '../../utils/dateHelpers';
 import ActivityRow from './ActivityRow';
-import ResourceStrip from './ResourceStrip';
 import '../../styles/builder.css';
 
 interface MilestoneDetailProps {
@@ -27,20 +26,17 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
     const newActivity: Activity = {
       id: crypto.randomUUID(),
       title: 'New activity',
-      type: 'video',
+      activityType: 'video',
     };
     onUpdate({ ...milestone, activities: [...milestone.activities, newActivity] });
   };
 
-  const updateResources = (resources: Resource[]) => {
-    onUpdate({ ...milestone, resources });
-  };
-
   const activityCount = milestone.activities.length;
-  const totalMinutes = milestone.activities.reduce(
-    (sum, a) => sum + (a.durationMinutes ?? 0),
+  const totalSeconds = milestone.activities.reduce(
+    (sum, a) => sum + (a.durationSeconds ?? 0),
     0,
   );
+  const totalMinutes = Math.round(totalSeconds / 60);
 
   return (
     <div className="milestone-detail">
@@ -50,14 +46,14 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
           <input
             className="milestone-title-input"
             autoFocus
-            value={milestone.title}
-            onChange={(e) => onUpdate({ ...milestone, title: e.target.value })}
+            value={milestone.name}
+            onChange={(e) => onUpdate({ ...milestone, name: e.target.value })}
             onBlur={() => setEditingTitle(false)}
             onKeyDown={(e) => e.key === 'Enter' && setEditingTitle(false)}
           />
         ) : (
           <span className="milestone-title-display" onClick={() => setEditingTitle(true)}>
-            {milestone.title || 'Untitled milestone'}
+            {milestone.name || 'Untitled milestone'}
           </span>
         )}
 
@@ -70,7 +66,7 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
       </div>
 
       {/* Session date (session milestones only) */}
-      {milestone.type === 'session' && (
+      {milestone.milestoneType === 'session' && (
         <div className="milestone-meta-row">
           <span className="meta-label">Session date</span>
           <input
@@ -105,7 +101,7 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
       </button>
 
       {/* Post-session survey (session milestones only) */}
-      {milestone.type === 'session' && (
+      {milestone.milestoneType === 'session' && (
         <div className="session-survey-section">
           <span className="session-survey-label">Post-session survey</span>
           <div className="session-survey-meta">
@@ -115,9 +111,6 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
           </div>
         </div>
       )}
-
-      {/* Resources */}
-      <ResourceStrip resources={milestone.resources} onUpdate={updateResources} />
     </div>
   );
 }

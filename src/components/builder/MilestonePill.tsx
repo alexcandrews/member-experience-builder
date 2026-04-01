@@ -38,15 +38,16 @@ export default function MilestonePill({
   if (isDragging) className += ' dragging';
 
   const activityCount = milestone.activities.length;
-  const totalMinutes = milestone.activities.reduce(
-    (sum, a) => sum + (a.durationMinutes ?? 0),
+  const totalSeconds = milestone.activities.reduce(
+    (sum, a) => sum + (a.durationSeconds ?? 0),
     0,
   );
+  const totalMinutes = Math.round(totalSeconds / 60);
 
   const toggleType = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const next: MilestoneType = milestone.type === 'chapter' ? 'session' : 'chapter';
-    onUpdate({ ...milestone, type: next });
+    const next: MilestoneType = milestone.milestoneType === 'chapter' ? 'session' : 'chapter';
+    onUpdate({ ...milestone, milestoneType: next });
   };
 
   const toggleOptional = (e: React.MouseEvent) => {
@@ -56,7 +57,7 @@ export default function MilestonePill({
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    onUpdate({ ...milestone, unlocksAt: localISOToDate(e.target.value) });
+    onUpdate({ ...milestone, unlockAt: localISOToDate(e.target.value) });
   };
 
   const handleDateBlur = () => {
@@ -70,7 +71,7 @@ export default function MilestonePill({
 
   const handleClearDate = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onUpdate({ ...milestone, unlocksAt: undefined });
+    onUpdate({ ...milestone, unlockAt: undefined });
     setEditingDate(false);
   };
 
@@ -109,20 +110,20 @@ export default function MilestonePill({
 
       {/* Type label — clickable to toggle */}
       <button
-        className={`pill-type-label ${milestone.type}`}
+        className={`pill-type-label ${milestone.milestoneType}`}
         onClick={toggleType}
         title="Click to toggle type"
       >
-        {milestone.type === 'chapter' ? 'Lesson' : 'Coaching Circle'}
+        {milestone.milestoneType === 'chapter' ? 'Lesson' : 'Coaching Circle'}
       </button>
 
       {/* Lock icon + title */}
       <div className="pill-title-row">
         {isLocked && <span className="pill-lock-icon">🔒</span>}
-        {!isLocked && milestone.type === 'session' && (
+        {!isLocked && milestone.milestoneType === 'session' && (
           <span className="pill-session-icon">👤</span>
         )}
-        <div className="pill-title">{milestone.title}</div>
+        <div className="pill-title">{milestone.name}</div>
       </div>
 
       {/* Activity metadata */}
@@ -141,14 +142,14 @@ export default function MilestonePill({
             className="pill-date-input"
             type="datetime-local"
             autoFocus
-            value={milestone.unlocksAt ? dateToLocalISO(milestone.unlocksAt) : ''}
+            value={milestone.unlockAt ? dateToLocalISO(milestone.unlockAt) : ''}
             onChange={handleDateChange}
             onBlur={handleDateBlur}
             onClick={(e) => e.stopPropagation()}
           />
-        ) : milestone.unlocksAt ? (
+        ) : milestone.unlockAt ? (
           <span className="pill-unlock-date" onClick={handleDateClick} title="Click to edit unlock date">
-            {isLocked ? '🔒 ' : ''}Unlocks {formatShortDate(milestone.unlocksAt)}
+            {isLocked ? '🔒 ' : ''}Unlocks {formatShortDate(milestone.unlockAt)}
             <button className="pill-date-clear" onClick={handleClearDate} title="Clear date">×</button>
           </span>
         ) : (

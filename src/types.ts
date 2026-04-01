@@ -3,29 +3,41 @@ export type ActivityType = 'assessment' | 'video' | 'resource';
 export interface Activity {
   id: string;
   title: string;
-  type: ActivityType;
-  associatedRecord?: string;
-  durationMinutes?: number;
+  activityType: ActivityType;
+  description?: string;
+  associatedRecordUuid?: string;
+  associatedRecordType?: string;
+  durationSeconds?: number;
+  requiredForMilestoneCompletion?: boolean;
 }
 
-export interface Resource {
-  id: string;
+export interface MilestoneObjective {
   title: string;
-  type: ActivityType;
-  thumbnailUrl?: string;
+  description?: string;
+}
+
+export interface MilestoneQuote {
+  content: string;
+  authorName: string;
+  authorImageUrl?: string;
 }
 
 export type MilestoneType = 'chapter' | 'session';
 
 export interface Milestone {
   id: string;
-  title: string;
-  type: MilestoneType;
+  name: string;
+  milestoneType: MilestoneType;
   optional: boolean;
-  unlocksAt?: Date;
-  sessionDate?: Date;
+  unlockAt?: Date;
+  sessionDate?: Date; // internal-only for simulator; not in export schema
+  description?: string;
+  durationInDays?: number;
+  memberDefaultStatus?: 'locked' | 'unlocked';
+  resourceListUuid?: string;
+  objectives?: MilestoneObjective[];
+  quotes?: MilestoneQuote[];
   activities: Activity[];
-  resources: Resource[];
 }
 
 export type CommRuleType =
@@ -37,21 +49,49 @@ export type CommRuleType =
 
 export interface CommRule {
   id: string;
-  type: CommRuleType;
-  minuteOffset?: number;
+  name: string;
+  triggerType: CommRuleType;
+  enabled: boolean;
+  triggerOffsetMinutes?: number;
+  courierTemplateKey?: string;
+}
+
+export type UnlockStrategy =
+  | 'by_completion'
+  | 'by_unlock_at_time'
+  | 'by_completion_and_unlock_at_time'
+  | 'by_completion_or_unlock_at_time';
+
+export interface RegistrationPeriod {
+  opensAt?: Date;
+  closesAt?: Date;
+  minimumSelection: number;
 }
 
 export interface PlanConfig {
-  unlockStrategy: 'by_completion' | 'by_time' | 'by_both' | 'by_either';
-  startDate?: Date;
-  registrationStartDate?: Date;
-  registrationEndDate?: Date;
+  unlockStrategy: UnlockStrategy;
+  startsAt?: Date;
+  communicationsEnabled: boolean;
+  registrationPeriod: RegistrationPeriod;
   commRules: CommRule[];
 }
 
 export interface Plan {
   id: string;
-  title: string;
+  name: string;
+  internalName?: string;
+  description?: string;
+  template?: boolean;
+  // Stub fields for future UI coverage (round-tripped via import/export)
+  publishedAt?: Date;
+  dueDatesEnabled?: boolean;
+  completionCertificateTemplate?: string;
+  calendarEventMode?: string;
+  calendarEventScheduledFor?: Date;
+  courierBrandKey?: string;
+  bannerUuid?: string;
+  planFamilyUuid?: string;
+  requiredPsaFeatures?: string[];
   milestones: Milestone[];
   config: PlanConfig;
 }

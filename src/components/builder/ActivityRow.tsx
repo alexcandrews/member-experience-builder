@@ -17,9 +17,12 @@ export default function ActivityRow({ activity, onUpdate, onDelete }: ActivityRo
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingRecord, setEditingRecord] = useState(false);
 
+  const durationMinutes =
+    activity.durationSeconds != null ? Math.round(activity.durationSeconds / 60) : null;
+
   return (
     <div className="activity-row">
-      <span className="activity-icon">{TYPE_ICONS[activity.type]}</span>
+      <span className="activity-icon">{TYPE_ICONS[activity.activityType]}</span>
 
       {editingTitle ? (
         <input
@@ -38,8 +41,8 @@ export default function ActivityRow({ activity, onUpdate, onDelete }: ActivityRo
 
       <select
         className="activity-type-select"
-        value={activity.type}
-        onChange={(e) => onUpdate({ ...activity, type: e.target.value as ActivityType })}
+        value={activity.activityType}
+        onChange={(e) => onUpdate({ ...activity, activityType: e.target.value as ActivityType })}
       >
         <option value="video">Video</option>
         <option value="assessment">Assessment</option>
@@ -50,9 +53,9 @@ export default function ActivityRow({ activity, onUpdate, onDelete }: ActivityRo
         <input
           className="activity-record-input"
           autoFocus
-          placeholder="Record ID / URL"
-          value={activity.associatedRecord ?? ''}
-          onChange={(e) => onUpdate({ ...activity, associatedRecord: e.target.value })}
+          placeholder="Record UUID"
+          value={activity.associatedRecordUuid ?? ''}
+          onChange={(e) => onUpdate({ ...activity, associatedRecordUuid: e.target.value })}
           onBlur={() => setEditingRecord(false)}
           onKeyDown={(e) => e.key === 'Enter' && setEditingRecord(false)}
         />
@@ -60,14 +63,14 @@ export default function ActivityRow({ activity, onUpdate, onDelete }: ActivityRo
         <span
           className="activity-record-display"
           onClick={() => setEditingRecord(true)}
-          title={activity.associatedRecord || 'Click to add record'}
+          title={activity.associatedRecordUuid || 'Click to add record UUID'}
         >
-          {activity.associatedRecord || '+ record'}
+          {activity.associatedRecordUuid || '+ record'}
         </span>
       )}
 
-      {activity.durationMinutes != null && (
-        <span className="activity-duration">{activity.durationMinutes} min</span>
+      {durationMinutes != null && (
+        <span className="activity-duration">{durationMinutes} min</span>
       )}
 
       <button className="activity-delete-btn" onClick={onDelete} title="Remove activity">

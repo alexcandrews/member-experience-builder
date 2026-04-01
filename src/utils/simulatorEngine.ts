@@ -21,7 +21,7 @@ export interface SimulatedEvent {
 
 /**
  * Computes the simulated unlock date for a milestone given the plan's unlock strategy.
- * For completion-based strategies, we approximate with sequential +7 day offsets from startDate,
+ * For completion-based strategies, we approximate with sequential +7 day offsets from startsAt,
  * skipping optional milestones in the chain.
  */
 function computeUnlockDate(
@@ -31,12 +31,11 @@ function computeUnlockDate(
   startDate: Date,
   strategy: Plan['config']['unlockStrategy'],
 ): Date | undefined {
-  const unlocksAt = milestone.unlocksAt;
+  const unlockAt = milestone.unlockAt;
 
   // Completion-based unlock: milestone 0 on startDate, each required subsequent
   // milestone unlocks 7 days after the prior required milestone's unlock.
   function completionDate(): Date {
-    // Find the chain of required milestones up to (not including) this one
     const requiredBefore = milestones.slice(0, index).filter((m) => !m.optional);
     let base = startDate;
     for (const _m of requiredBefore) {
@@ -46,24 +45,22 @@ function computeUnlockDate(
   }
 
   switch (strategy) {
-    case 'by_time':
-      return unlocksAt ?? completionDate();
+    case 'by_unlock_at_time':
+      return unlockAt ?? completionDate();
 
     case 'by_completion':
       return completionDate();
 
-    case 'by_both': {
+    case 'by_completion_and_unlock_at_time': {
       const comp = completionDate();
-      if (!unlocksAt) return comp;
-      // Both must pass: use the later date
-      return new Date(Math.max(comp.getTime(), unlocksAt.getTime()));
+      if (!unlockAt) return comp;
+      return new Date(Math.max(comp.getTime(), unlockAt.getTime()));
     }
 
-    case 'by_either': {
+    case 'by_completion_or_unlock_at_time': {
       const comp = completionDate();
-      if (!unlocksAt) return comp;
-      // Either: use the earlier date
-      return new Date(Math.min(comp.getTime(), unlocksAt.getTime()));
+      if (!unlockAt) return comp;
+      return new Date(Math.min(comp.getTime(), unlockAt.getTime()));
     }
   }
 }
@@ -71,7 +68,7 @@ function computeUnlockDate(
 export function computeEvents(plan: Plan, upToDate: Date): SimulatedEvent[] {
   const events: SimulatedEvent[] = [];
   const { config, milestones } = plan;
-  const startDate = config.startDate;
+  const startDate = config.startsAt;
 
   if (!startDate) return [];
 
@@ -87,7 +84,7 @@ export function computeEvents(plan: Plan, upToDate: Date): SimulatedEvent[] {
       label: 'Plan started',
     });
 
-    const startRule = config.commRules.find((r) => r.type === 'start_of_plan');
+    const startRule = config.commRules.find((r) => r.triggerType === 'start_of_plan' && r.enabled);
     if (startRule) {
       events.push({
         id: nextId(),
@@ -120,21 +117,21 @@ export function computeEvents(plan: Plan, upToDate: Date): SimulatedEvent[] {
         id: nextId(),
         type: 'milestone_unlock',
         date: unlockDate,
-        label: `Milestone unlocked: ${milestone.title}`,
+        label: `Milestone unlocked: ${milestone.name}`,
         milestoneId: milestone.id,
       });
 
       // Milestone reminders (fired after unlock)
       config.commRules
-        .filter((r) => r.type === 'milestone_reminder' && r.minuteOffset !== undefined)
+        .filter((r) => r.triggerType === 'milestone_reminder' && r.enabled && r.triggerOffsetMinutes !== undefined)
         .forEach((rule) => {
-          const commDate = addMinutes(unlockDate, rule.minuteOffset!);
+          const commDate = addMinutes(unlockDate, rule.triggerOffsetMinutes!);
           if (dateLE(commDate, upToDate)) {
             events.push({
               id: nextId(),
               type: 'comm_milestone_reminder',
               date: commDate,
-              label: `Milestone reminder: ${milestone.title}`,
+              label: `Milestone reminder: ${milestone.name}`,
               milestoneId: milestone.id,
               commRuleId: rule.id,
             });
@@ -143,19 +140,19 @@ export function computeEvents(plan: Plan, upToDate: Date): SimulatedEvent[] {
     }
 
     // Session-specific comms
-    if (milestone.type === 'session' && milestone.sessionDate) {
+    if (milestone.milestoneType === 'session' && milestone.sessionDate) {
       const sessionDate = milestone.sessionDate;
 
       config.commRules
-        .filter((r) => r.type === 'session_reminder' && r.minuteOffset !== undefined)
+        .filter((r) => r.triggerType === 'session_reminder' && r.enabled && r.triggerOffsetMinutes !== undefined)
         .forEach((rule) => {
-          const commDate = addMinutes(sessionDate, rule.minuteOffset!);
+          const commDate = addMinutes(sessionDate, rule.triggerOffsetMinutes!);
           if (dateLE(commDate, upToDate)) {
             events.push({
               id: nextId(),
               type: 'comm_session_reminder',
               date: commDate,
-              label: `Session reminder: ${milestone.title}`,
+              label: `Session reminder: ${milestone.name}`,
               milestoneId: milestone.id,
               commRuleId: rule.id,
             });
@@ -163,15 +160,15 @@ export function computeEvents(plan: Plan, upToDate: Date): SimulatedEvent[] {
         });
 
       config.commRules
-        .filter((r) => r.type === 'session_followup' && r.minuteOffset !== undefined)
+        .filter((r) => r.triggerType === 'session_followup' && r.enabled && r.triggerOffsetMinutes !== undefined)
         .forEach((rule) => {
-          const commDate = addMinutes(sessionDate, rule.minuteOffset!);
+          const commDate = addMinutes(sessionDate, rule.triggerOffsetMinutes!);
           if (dateLE(commDate, upToDate)) {
             events.push({
               id: nextId(),
               type: 'comm_session_followup',
               date: commDate,
-              label: `Session follow-up: ${milestone.title}`,
+              label: `Session follow-up: ${milestone.name}`,
               milestoneId: milestone.id,
               commRuleId: rule.id,
             });
@@ -181,7 +178,7 @@ export function computeEvents(plan: Plan, upToDate: Date): SimulatedEvent[] {
   });
 
   // End of plan: fire on last milestone's unlock date
-  const endRule = config.commRules.find((r) => r.type === 'end_of_plan');
+  const endRule = config.commRules.find((r) => r.triggerType === 'end_of_plan' && r.enabled);
   if (endRule && unlockDates.length > 0) {
     const lastUnlock = unlockDates.reduce((a, b) => (a.getTime() > b.getTime() ? a : b));
     if (dateLE(lastUnlock, upToDate)) {
