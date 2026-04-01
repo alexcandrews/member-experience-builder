@@ -1,0 +1,217 @@
+/* ─── Simulator Page ──────────────────────────────────────────────────────── */
+.simulator-page {
+  padding: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.simulator-intro {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.simulator-intro h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 6px;
+}
+
+.simulator-intro p {
+  font-size: 14px;
+  color: #777;
+  margin: 0;
+}
+
+/* ─── Date Control ────────────────────────────────────────────────────────── */
+.date-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 32px;
+}
+
+.date-nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.date-nav-btn:hover {
+  border-color: #1a5068;
+  color: #1a5068;
+  background: #f0f7fb;
+}
+
+.date-display-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-display {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  background: white;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  white-space: nowrap;
+}
+
+.date-display:hover {
+  border-color: #1a5068;
+}
+
+.date-input-hidden {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+/* ─── Timeline ────────────────────────────────────────────────────────────── */
+.event-timeline {
+  position: relative;
+  padding-left: 36px;
+}
+
+.event-timeline::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #e8e8e8;
+  border-radius: 1px;
+}
+
+.timeline-event {
+  position: relative;
+  margin-bottom: 14px;
+  background: white;
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #f0f0f0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.timeline-event::before {
+  content: '';
+  position: absolute;
+  left: -27px;
+  top: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #1a5068;
+  border: 2.5px solid white;
+  box-shadow: 0 0 0 2px #1a5068;
+}
+
+.timeline-event-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.timeline-event-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-event-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 3px;
+}
+
+.timeline-event-date {
+  font-size: 12px;
+  color: #888;
+}
+
+.timeline-event-chip {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.chip-enrollment {
+  background: #d4f5e9;
+  color: #0d6641;
+}
+
+.chip-unlock {
+  background: #d4eaf3;
+  color: #1a5068;
+}
+
+.chip-comm {
+  background: #dce8ff;
+  color: #2a52a8;
+}
+
+.chip-reminder {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.chip-followup {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+/* Empty timeline */
+.timeline-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: #aaa;
+}
+
+.timeline-empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.timeline-empty p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* No plan start warning */
+.simulator-warning {
+  background: #fff8e6;
+  border: 1px solid #ffd977;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #7a5800;
+  margin-bottom: 24px;
+  text-align: center;
+}

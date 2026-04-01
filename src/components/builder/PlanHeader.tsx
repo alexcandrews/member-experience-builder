@@ -1,0 +1,103 @@
+import { useState } from 'react';
+import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import type { Plan, Milestone, PlanUpdater } from '../../types';
+import MilestonePill from './MilestonePill';
+import '../../styles/builder.css';
+
+interface PlanHeaderProps {
+  plan: Plan;
+  updatePlan: PlanUpdater;
+  selectedMilestoneId: string;
+  onSelectMilestone: (id: string) => void;
+  onOpenConfig: () => void;
+}
+
+export default function PlanHeader({
+  plan,
+  updatePlan,
+  selectedMilestoneId,
+  onSelectMilestone,
+  onOpenConfig,
+}: PlanHeaderProps) {
+  const [editingTitle, setEditingTitle] = useState(false);
+
+  const handleTitleChange = (value: string) => {
+    updatePlan((prev) => ({ ...prev, title: value }));
+  };
+
+  const handleAddMilestone = () => {
+    const newMilestone: Milestone = {
+      id: crypto.randomUUID(),
+      title: 'New Milestone',
+      type: 'chapter',
+      optional: false,
+      activities: [],
+      resources: [],
+    };
+    updatePlan((prev) => ({ ...prev, milestones: [...prev.milestones, newMilestone] }));
+    onSelectMilestone(newMilestone.id);
+  };
+
+  // A milestone is "locked" for display purposes if it's not the first and
+  // the current date hasn't passed its unlock time. For the builder we simply
+  // show all as available but render the lock icon if unlocksAt is in the future.
+  const now = new Date();
+  const isLocked = (m: Milestone) =>
+    m.unlocksAt != null && m.unlocksAt.getTime() > now.getTime();
+
+  return (
+    <div className="plan-header">
+      <div className="plan-header-top">
+        <div>
+          <p className="plan-header-label">Your program in progress</p>
+          <div className="plan-title-wrap">
+            {editingTitle ? (
+              <input
+                className="plan-title-input"
+                autoFocus
+                value={plan.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                onBlur={() => setEditingTitle(false)}
+                onKeyDown={(e) => e.key === 'Enter' && setEditingTitle(false)}
+              />
+            ) : (
+              <h1 className="plan-title" onClick={() => setEditingTitle(true)} title="Click to edit">
+                {plan.title || 'Untitled Plan'}
+              </h1>
+            )}
+          </div>
+        </div>
+
+        <button className="config-btn" onClick={onOpenConfig} title="Plan configuration">
+          ⚙ Configure
+        </button>
+      </div>
+
+      {/* Milestone strip */}
+      <div className="milestone-strip">
+        <SortableContext
+          items={plan.milestones.map((m) => m.id)}
+          strategy={horizontalListSortingStrategy}
+        >
+          {plan.milestones.map((milestone) => (
+            <MilestonePill
+              key={milestone.id}
+              milestone={milestone}
+              isSelected={milestone.id === selectedMilestoneId}
+              isLocked={isLocked(milestone)}
+              onClick={() => onSelectMilestone(milestone.id)}
+            />
+          ))}
+        </SortableContext>
+
+        <button
+          className="milestone-pill-add"
+          onClick={handleAddMilestone}
+          title="Add milestone"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
