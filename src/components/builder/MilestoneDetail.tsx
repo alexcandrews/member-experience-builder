@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Activity, Milestone, MilestoneType, Resource } from '../../types';
+import type { Activity, Milestone, Resource } from '../../types';
 import { dateToLocalISO, localISOToDate } from '../../utils/dateHelpers';
 import ActivityRow from './ActivityRow';
 import ResourceStrip from './ResourceStrip';
@@ -8,10 +8,9 @@ import '../../styles/builder.css';
 interface MilestoneDetailProps {
   milestone: Milestone;
   onUpdate: (updated: Milestone) => void;
-  onDelete: () => void;
 }
 
-export default function MilestoneDetail({ milestone, onUpdate, onDelete }: MilestoneDetailProps) {
+export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetailProps) {
   const [editingTitle, setEditingTitle] = useState(false);
 
   const updateActivity = (index: number, updated: Activity) => {
@@ -62,76 +61,29 @@ export default function MilestoneDetail({ milestone, onUpdate, onDelete }: Miles
           </span>
         )}
 
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          {activityCount > 0 && (
-            <span style={{ fontSize: 12, color: '#888', alignSelf: 'center' }}>
-              {activityCount} {activityCount === 1 ? 'activity' : 'activities'}
-              {totalMinutes > 0 ? ` · ${totalMinutes} min total` : ''}
-            </span>
-          )}
-          <button
-            onClick={onDelete}
-            style={{
-              background: 'none',
-              border: '1px solid #eee',
-              borderRadius: 6,
-              color: '#ccc',
-              cursor: 'pointer',
-              fontSize: 12,
-              padding: '4px 8px',
-            }}
-            title="Delete milestone"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-
-      {/* Meta controls */}
-      <div className="milestone-meta-row">
-        <span className="meta-label">Type</span>
-        <select
-          className="meta-select"
-          value={milestone.type}
-          onChange={(e) => onUpdate({ ...milestone, type: e.target.value as MilestoneType })}
-        >
-          <option value="chapter">Chapter</option>
-          <option value="session">Session</option>
-        </select>
-
-        <span className="meta-label">Unlock at</span>
-        <input
-          className="meta-datetime"
-          type="datetime-local"
-          value={milestone.unlocksAt ? dateToLocalISO(milestone.unlocksAt) : ''}
-          onChange={(e) =>
-            onUpdate({ ...milestone, unlocksAt: localISOToDate(e.target.value) })
-          }
-        />
-
-        {milestone.type === 'session' && (
-          <>
-            <span className="meta-label">Session date</span>
-            <input
-              className="meta-datetime"
-              type="datetime-local"
-              value={milestone.sessionDate ? dateToLocalISO(milestone.sessionDate) : ''}
-              onChange={(e) =>
-                onUpdate({ ...milestone, sessionDate: localISOToDate(e.target.value) })
-              }
-            />
-          </>
+        {activityCount > 0 && (
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#888', alignSelf: 'center' }}>
+            {activityCount} {activityCount === 1 ? 'activity' : 'activities'}
+            {totalMinutes > 0 ? ` · ${totalMinutes} min total` : ''}
+          </span>
         )}
-
-        <label className="meta-toggle">
-          <input
-            type="checkbox"
-            checked={milestone.optional}
-            onChange={(e) => onUpdate({ ...milestone, optional: e.target.checked })}
-          />
-          Optional
-        </label>
       </div>
+
+      {/* Session date (session milestones only) */}
+      {milestone.type === 'session' && (
+        <div className="milestone-meta-row">
+          <span className="meta-label">Session date</span>
+          <input
+            className="meta-datetime"
+            type="datetime-local"
+            value={milestone.sessionDate ? dateToLocalISO(milestone.sessionDate) : ''}
+            onChange={(e) =>
+              onUpdate({ ...milestone, sessionDate: localISOToDate(e.target.value) })
+            }
+            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
+          />
+        </div>
+      )}
 
       {/* Activities */}
       <h3 className="section-heading">Activities</h3>

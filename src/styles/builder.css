@@ -48,10 +48,8 @@
   font-size: 28px;
   font-weight: 700;
   color: white;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 6px;
-  padding: 2px 10px;
+  background: transparent;
+  border: none;
   outline: none;
   width: 400px;
   max-width: 100%;
@@ -98,11 +96,11 @@
 
 /* ─── Milestone Pill ──────────────────────────────────────────────────────── */
 .milestone-pill {
-  min-width: 164px;
-  max-width: 164px;
+  min-width: 180px;
+  max-width: 180px;
   background: white;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 10px 10px 8px 20px;
   cursor: pointer;
   border: 2px solid transparent;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -124,7 +122,7 @@
 }
 
 .milestone-pill.locked {
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
 .milestone-pill.dragging {
@@ -132,28 +130,102 @@
   transform: scale(0.97);
 }
 
+/* Drag handle — left edge */
 .pill-drag-handle {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  color: #bbb;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ccc;
   cursor: grab;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
   padding: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.milestone-pill:hover .pill-drag-handle {
+  opacity: 1;
 }
 
 .pill-drag-handle:active {
   cursor: grabbing;
 }
 
-.pill-status {
+/* Hover-reveal delete X */
+.pill-delete-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.45);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.milestone-pill:hover .pill-delete-btn {
+  opacity: 1;
+}
+
+.pill-delete-btn:hover {
+  background: rgba(220, 38, 38, 0.8);
+}
+
+/* Type label — top, clickable to toggle */
+.pill-type-label {
+  display: inline-flex;
+  align-items: center;
   font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 700;
   text-transform: uppercase;
-  color: #e91e8c;
-  margin-bottom: 2px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: opacity 0.15s;
+}
+
+.pill-type-label:hover {
+  opacity: 0.75;
+}
+
+.pill-type-label.chapter {
+  background: #e8f4f8;
+  color: #1a5068;
+}
+
+.pill-type-label.session {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+/* Title row with optional lock/session icon */
+.pill-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.pill-lock-icon,
+.pill-session-icon {
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .pill-title {
@@ -167,41 +239,104 @@
   -webkit-box-orient: vertical;
 }
 
-.pill-meta {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  color: #888;
+/* Activity metadata */
+.pill-activity-meta {
+  font-size: 9px;
+  font-weight: 500;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Unlock date row */
+.pill-unlock-row {
   margin-top: 2px;
 }
 
-.pill-type-badge {
+.pill-unlock-date {
   display: inline-flex;
   align-items: center;
   gap: 3px;
   font-size: 9px;
   font-weight: 600;
+  color: #e91e8c;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.pill-unlock-date:hover {
+  text-decoration: underline;
+}
+
+.pill-date-clear {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  line-height: 1;
+  margin-left: 2px;
+}
+
+.pill-date-clear:hover {
+  color: #e91e8c;
+}
+
+.pill-date-input {
+  font-size: 10px;
+  border: 1px solid #ddd;
   border-radius: 4px;
+  padding: 2px 4px;
+  width: 100%;
+  color: #333;
+  outline: none;
 }
 
-.pill-type-badge.chapter {
-  background: #e8f4f8;
-  color: #1a5068;
-}
-
-.pill-type-badge.session {
-  background: #f3e8ff;
-  color: #7c3aed;
-}
-
-.pill-optional {
+.pill-add-date-btn {
+  background: none;
+  border: none;
   font-size: 9px;
-  color: #aaa;
-  font-style: italic;
+  color: #bbb;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.pill-add-date-btn:hover {
+  color: #888;
+}
+
+/* Optional/Required footer badge */
+.pill-footer {
+  margin-top: 2px;
+}
+
+.pill-optional-badge {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #bbb;
+  cursor: pointer;
+  padding: 1px 5px;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.pill-optional-badge.active {
+  border-color: #e91e8c;
+  color: #e91e8c;
+  background: #fdf0f8;
+}
+
+.pill-optional-badge:hover {
+  border-color: #aaa;
+  color: #666;
 }
 
 /* Add milestone pill */
@@ -261,9 +396,8 @@
   font-size: 22px;
   font-weight: 700;
   color: #111;
-  border: 1px solid #0f3442;
-  border-radius: 6px;
-  padding: 2px 10px;
+  background: transparent;
+  border: none;
   outline: none;
   min-width: 300px;
 }
@@ -376,9 +510,8 @@
   flex: 1;
   font-size: 14px;
   color: #222;
-  border: 1px solid #0f3442;
-  border-radius: 4px;
-  padding: 2px 8px;
+  background: transparent;
+  border: none;
   outline: none;
 }
 
@@ -418,9 +551,8 @@
 .activity-record-input {
   font-size: 11px;
   color: #555;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 1px 6px;
+  background: transparent;
+  border: none;
   outline: none;
   width: 110px;
 }

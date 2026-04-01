@@ -56,13 +56,13 @@ export default function BuilderPage({
     }));
   };
 
-  const handleMilestoneDelete = () => {
+  const handleMilestoneDelete = (milestoneId: string) => {
     updatePlan((prev) => {
-      const remaining = prev.milestones.filter((m) => m.id !== selectedMilestone?.id);
+      const remaining = prev.milestones.filter((m) => m.id !== milestoneId);
       return { ...prev, milestones: remaining };
     });
     // Select adjacent milestone after delete
-    const currentIndex = plan.milestones.findIndex((m) => m.id === selectedMilestone?.id);
+    const currentIndex = plan.milestones.findIndex((m) => m.id === milestoneId);
     const next =
       plan.milestones[currentIndex + 1] ?? plan.milestones[currentIndex - 1];
     if (next) onSelectMilestone(next.id);
@@ -81,6 +81,8 @@ export default function BuilderPage({
           selectedMilestoneId={selectedMilestoneId}
           onSelectMilestone={onSelectMilestone}
           onOpenConfig={() => setConfigOpen(true)}
+          onUpdateMilestone={handleMilestoneUpdate}
+          onDeleteMilestone={handleMilestoneDelete}
         />
       </DndContext>
 
@@ -88,7 +90,6 @@ export default function BuilderPage({
         <MilestoneDetail
           milestone={selectedMilestone}
           onUpdate={handleMilestoneUpdate}
-          onDelete={handleMilestoneDelete}
         />
       ) : (
         <div className="empty-milestone">

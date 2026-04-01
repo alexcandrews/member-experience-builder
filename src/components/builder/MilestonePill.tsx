@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { Milestone } from '../../types';
-import { formatShortDate } from '../../utils/dateHelpers';
+import type { Milestone, MilestoneType } from '../../types';
+import { formatShortDate, dateToLocalISO, localISOToDate } from '../../utils/dateHelpers';
 
 interface MilestonePillProps {
   milestone: Milestone;
   isSelected: boolean;
   isLocked: boolean;
   onClick: () => void;
+  onUpdate: (updated: Milestone) => void;
+  onDelete: () => void;
 }
 
 export default function MilestonePill({
@@ -15,7 +18,11 @@ export default function MilestonePill({
   isSelected,
   isLocked,
   onClick,
+  onUpdate,
+  onDelete,
 }: MilestonePillProps) {
+  const [editingDate, setEditingDate] = useState(false);
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: milestone.id,
   });
@@ -30,6 +37,43 @@ export default function MilestonePill({
   if (isLocked) className += ' locked';
   if (isDragging) className += ' dragging';
 
+  const activityCount = milestone.activities.length;
+  const totalMinutes = milestone.activities.reduce(
+    (sum, a) => sum + (a.durationMinutes ?? 0),
+    0,
+  );
+
+  const toggleType = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next: MilestoneType = milestone.type === 'chapter' ? 'session' : 'chapter';
+    onUpdate({ ...milestone, type: next });
+  };
+
+  const toggleOptional = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onUpdate({ ...milestone, optional: !milestone.optional });
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    onUpdate({ ...milestone, unlocksAt: localISOToDate(e.target.value) });
+  };
+
+  const handleDateBlur = () => {
+    setEditingDate(false);
+  };
+
+  const handleDateClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingDate(true);
+  };
+
+  const handleClearDate = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onUpdate({ ...milestone, unlocksAt: undefined });
+    setEditingDate(false);
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -40,7 +84,7 @@ export default function MilestonePill({
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
     >
-      {/* Drag handle */}
+      {/* Drag handle — left edge */}
       <span
         className="pill-drag-handle"
         {...attributes}
@@ -51,26 +95,79 @@ export default function MilestonePill({
         ⠿
       </span>
 
-      {isLocked && (
-        <div className="pill-status">
-          🔒 UNLOCKS {milestone.unlocksAt ? formatShortDate(milestone.unlocksAt) : ''}
-        </div>
-      )}
+      {/* Hover-reveal delete X */}
+      <button
+        className="pill-delete-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+        title="Delete milestone"
+      >
+        ×
+      </button>
 
-      <div className="pill-title">{milestone.title}</div>
+      {/* Type label — clickable to toggle */}
+      <button
+        className={`pill-type-label ${milestone.type}`}
+        onClick={toggleType}
+        title="Click to toggle type"
+      >
+        {milestone.type === 'chapter' ? 'Lesson' : 'Coaching Circle'}
+      </button>
 
-      <div className="pill-meta">
-        <span className={`pill-type-badge ${milestone.type}`}>
-          {milestone.type === 'chapter' ? '📖 Chapter' : '👥 Session'}
-        </span>
-        {milestone.optional && <span className="pill-optional">Optional</span>}
+      {/* Lock icon + title */}
+      <div className="pill-title-row">
+        {isLocked && <span className="pill-lock-icon">🔒</span>}
+        {!isLocked && milestone.type === 'session' && (
+          <span className="pill-session-icon">👤</span>
+        )}
+        <div className="pill-title">{milestone.title}</div>
       </div>
 
-      {milestone.unlocksAt && !isLocked && (
-        <div className="pill-meta" style={{ fontSize: 10, color: '#aaa' }}>
-          {formatShortDate(milestone.unlocksAt)}
+      {/* Activity metadata */}
+      {activityCount > 0 && (
+        <div className="pill-activity-meta">
+          {activityCount} {activityCount === 1 ? 'activity' : 'activities'}
+          {totalMinutes > 0 ? ` · ${totalMinutes} min` : ''}
         </div>
       )}
+
+      {/* Unlock date row */}
+      <div className="pill-unlock-row" onClick={(e) => e.stopPropagation()}>
+        {editingDate ? (
+          <input
+            ref={(el) => { if (el) setTimeout(() => el.showPicker?.(), 0); }}
+            className="pill-date-input"
+            type="datetime-local"
+            autoFocus
+            value={milestone.unlocksAt ? dateToLocalISO(milestone.unlocksAt) : ''}
+            onChange={handleDateChange}
+            onBlur={handleDateBlur}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : milestone.unlocksAt ? (
+          <span className="pill-unlock-date" onClick={handleDateClick} title="Click to edit unlock date">
+            {isLocked ? '🔒 ' : ''}Unlocks {formatShortDate(milestone.unlocksAt)}
+            <button className="pill-date-clear" onClick={handleClearDate} title="Clear date">×</button>
+          </span>
+        ) : (
+          <button className="pill-add-date-btn" onClick={handleDateClick}>
+            + Set unlock date
+          </button>
+        )}
+      </div>
+
+      {/* Optional badge */}
+      <div className="pill-footer">
+        <button
+          className={`pill-optional-badge ${milestone.optional ? 'active' : ''}`}
+          onClick={toggleOptional}
+          title="Toggle optional"
+        >
+          {milestone.optional ? 'Optional' : 'Required'}
+        </button>
+      </div>
     </div>
   );
 }

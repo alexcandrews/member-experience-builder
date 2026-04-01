@@ -10,6 +10,8 @@ interface PlanHeaderProps {
   selectedMilestoneId: string;
   onSelectMilestone: (id: string) => void;
   onOpenConfig: () => void;
+  onUpdateMilestone: (updated: Milestone) => void;
+  onDeleteMilestone: (id: string) => void;
 }
 
 export default function PlanHeader({
@@ -18,6 +20,8 @@ export default function PlanHeader({
   selectedMilestoneId,
   onSelectMilestone,
   onOpenConfig,
+  onUpdateMilestone,
+  onDeleteMilestone,
 }: PlanHeaderProps) {
   const [editingTitle, setEditingTitle] = useState(false);
 
@@ -86,6 +90,8 @@ export default function PlanHeader({
               isSelected={milestone.id === selectedMilestoneId}
               isLocked={isLocked(milestone)}
               onClick={() => onSelectMilestone(milestone.id)}
+              onUpdate={onUpdateMilestone}
+              onDelete={() => onDeleteMilestone(milestone.id)}
             />
           ))}
         </SortableContext>
