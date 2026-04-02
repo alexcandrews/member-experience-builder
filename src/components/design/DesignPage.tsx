@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import type { Plan, Milestone, Activity, PlanUpdater } from '../../types';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import type { Plan, Milestone, Activity, MilestoneType, PlanUpdater } from '../../types';
+import { dateToLocalISO, localISOToDate, formatShortDate } from '../../utils/dateHelpers';
 import '../../styles/design.css';
 
 interface DesignPageProps {
@@ -37,19 +39,16 @@ function getChipVariant(milestone: Milestone, isSelected: boolean): ChipVariant 
   return 'upcoming';
 }
 
-function chipLabel(milestone: Milestone, index: number): string {
-  if (milestone.milestoneType === 'session') {
-    if (milestone.sessionDate) {
-      return milestone.sessionDate.toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-    }
-    return 'Session';
+function chipLabel(milestone: Milestone): string {
+  if (milestone.milestoneType === 'session' && milestone.sessionDate) {
+    return milestone.sessionDate.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
   }
-  return `Lesson ${index + 1}`;
+  return milestone.name;
 }
 
 // ── Icons (inline SVG) ────────────────────────────────────────────────────────
@@ -124,27 +123,66 @@ function MilestoneChip({
   index,
   variant,
   onClick,
+  onUpdate,
 }: {
   milestone: Milestone;
   index: number;
   variant: ChipVariant;
   onClick: () => void;
+  onUpdate: (updated: Milestone) => void;
 }) {
-  const label = chipLabel(milestone, index);
+  const label = chipLabel(milestone);
   const activityCount = milestone.activities.length;
   const duration = totalDuration(milestone.activities);
   const unlockStr = formatDate(milestone.unlockAt);
 
+  const [showMenu, setShowMenu] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const [editingDate, setEditingDate] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+        setEditingDate(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowMenu(false);
+        setEditingDate(false);
+      }
+    };
+    document.addEventListener('mousedown', handleDown);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleDown);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [showMenu]);
+
+  const openMenu = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = btnRef.current!.getBoundingClientRect();
+    setMenuPos({ top: rect.bottom + 6, left: Math.max(8, rect.right - 228) });
+    setShowMenu((v) => !v);
+  };
+
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       className={`design-chip design-chip--${variant}`}
       onClick={onClick}
-      type="button"
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
     >
       <span className="design-chip-label">{label}</span>
       <div className="design-chip-value">
         {variant === 'locked' && <LockIcon />}
-        <span className="design-chip-title">{milestone.name}</span>
+        <span className="design-chip-title">{milestone.description ?? milestone.name}</span>
       </div>
       {variant === 'active' && (
         <div className="design-chip-meta">
@@ -161,7 +199,142 @@ function MilestoneChip({
           )}
         </div>
       )}
-    </button>
+
+      {/* Three-dot menu button — revealed on hover */}
+      <button
+        ref={btnRef}
+        className="design-chip-menu-btn"
+        type="button"
+        aria-label="Milestone options"
+        onClick={openMenu}
+      >
+        ⋯
+      </button>
+
+      {/* Floating context menu — portaled to body to escape backdrop-filter containing block */}
+      {showMenu && menuPos && createPortal(
+        <div
+          ref={menuRef}
+          className="design-chip-menu"
+          style={{ top: menuPos.top, left: menuPos.left }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* 1. Name (e.g. "Lesson 1") */}
+          <div className="design-chip-menu-row">
+            <span className="design-chip-menu-lbl">Name</span>
+            <input
+              className="design-chip-menu-input"
+              value={milestone.name}
+              onChange={(e) => onUpdate({ ...milestone, name: e.target.value })}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+
+          {/* 2. Description (e.g. "Intro to Dare to Lead") */}
+          <div className="design-chip-menu-row">
+            <span className="design-chip-menu-lbl">Description</span>
+            <input
+              className="design-chip-menu-input"
+              value={milestone.description ?? ''}
+              placeholder="Milestone description"
+              onChange={(e) => onUpdate({ ...milestone, description: e.target.value || undefined })}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+
+          {/* 2. Type */}
+          <div className="design-chip-menu-row">
+            <span className="design-chip-menu-lbl">Type</span>
+            <div className="design-chip-menu-seg">
+              {(['chapter', 'session'] as MilestoneType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={`design-chip-menu-seg-btn${milestone.milestoneType === t ? ' active' : ''}`}
+                  onClick={() => onUpdate({ ...milestone, milestoneType: t })}
+                >
+                  {t === 'chapter' ? 'Chapter' : 'Session'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Default status */}
+          <div className="design-chip-menu-row">
+            <span className="design-chip-menu-lbl">Default Status</span>
+            <div className="design-chip-menu-seg">
+              {(['unlocked', 'locked'] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`design-chip-menu-seg-btn${(milestone.memberDefaultStatus ?? 'unlocked') === s ? ' active' : ''}`}
+                  onClick={() => onUpdate({ ...milestone, memberDefaultStatus: s })}
+                >
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. Unlocks at */}
+          <div className="design-chip-menu-row">
+            <span className="design-chip-menu-lbl">Unlocks At</span>
+            <div className="design-chip-menu-date-row">
+              {editingDate ? (
+                <input
+                  className="design-chip-menu-date-input"
+                  type="datetime-local"
+                  autoFocus
+                  value={milestone.unlockAt ? dateToLocalISO(milestone.unlockAt) : ''}
+                  onChange={(e) => onUpdate({ ...milestone, unlockAt: localISOToDate(e.target.value) })}
+                  onBlur={() => setEditingDate(false)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : milestone.unlockAt ? (
+                <>
+                  <span
+                    style={{ flex: 1, cursor: 'pointer', fontSize: 12 }}
+                    onClick={() => setEditingDate(true)}
+                    title="Click to edit"
+                  >
+                    {formatShortDate(milestone.unlockAt)}
+                  </span>
+                  <button
+                    type="button"
+                    className="design-chip-menu-date-clear"
+                    onClick={() => onUpdate({ ...milestone, unlockAt: undefined })}
+                    title="Clear date"
+                  >
+                    ×
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="design-chip-menu-date-btn"
+                  onClick={() => setEditingDate(true)}
+                >
+                  Set date
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 5. Optional */}
+          <div className="design-chip-menu-row">
+            <label className="design-chip-menu-check-row">
+              <input
+                type="checkbox"
+                checked={milestone.optional}
+                onChange={() => onUpdate({ ...milestone, optional: !milestone.optional })}
+              />
+              Optional
+            </label>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </div>
   );
 }
 
@@ -280,6 +453,12 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
                   index={index}
                   variant={variant}
                   onClick={() => setSelectedId(milestone.id)}
+                  onUpdate={(updated) =>
+                    updatePlan((prev) => ({
+                      ...prev,
+                      milestones: prev.milestones.map((m) => (m.id === updated.id ? updated : m)),
+                    }))
+                  }
                 />
               );
             })}
@@ -294,11 +473,11 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
             <input
               className="design-plan-title-input"
               autoFocus
-              value={selectedMilestone.name}
+              value={selectedMilestone.description ?? ''}
               onChange={(e) => updatePlan((prev) => ({
                 ...prev,
                 milestones: prev.milestones.map((m) =>
-                  m.id === selectedMilestone.id ? { ...m, name: e.target.value } : m
+                  m.id === selectedMilestone.id ? { ...m, description: e.target.value || undefined } : m
                 ),
               }))}
               onBlur={() => setEditingMilestoneName(false)}
@@ -310,7 +489,7 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
               onClick={() => setEditingMilestoneName(true)}
               title="Click to edit"
             >
-              {selectedMilestone.name}
+              {selectedMilestone.description ?? selectedMilestone.name}
             </h1>
           )}
         </div>

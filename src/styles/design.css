@@ -160,7 +160,7 @@
 .design-chip {
   border-radius: 12px;
   padding: 12px;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -171,6 +171,7 @@
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   transition: opacity 0.15s;
+  position: relative;
 }
 
 .design-chip:hover {
@@ -661,4 +662,189 @@
   font-size: 14px;
   color: var(--color-body);
   opacity: 0.3;
+}
+
+/* ─── Milestone Chip Context Menu ─────────────────────────────────────────── */
+
+.design-chip-menu-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.12);
+  border: none;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 16px;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s, background 0.15s;
+  line-height: 1;
+  padding: 0;
+}
+
+.design-chip:hover .design-chip-menu-btn {
+  opacity: 1;
+}
+
+.design-chip-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.design-chip-menu {
+  position: fixed;
+  z-index: 1000;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  padding: 14px;
+  width: 228px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font-sans);
+}
+
+.design-chip-menu-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.design-chip-menu-lbl {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.design-chip-menu-input {
+  font-size: 13px;
+  font-family: var(--font-sans);
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 5px 8px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  color: var(--color-heading);
+  background: #fff;
+  color-scheme: light;
+}
+
+.design-chip-menu-input:focus {
+  border-color: #4d9b99;
+}
+
+/* iOS-style pill segmented control: gray track, white active pill */
+.design-chip-menu-seg {
+  display: flex;
+  background: #efefef;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+  border: none;
+}
+
+.design-chip-menu-seg-btn {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  border: none;
+  background: transparent;
+  padding: 5px 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #666;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.design-chip-menu-seg-btn.active {
+  background: #fff;
+  color: var(--color-heading);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+.design-chip-menu-date-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-body);
+  min-height: 26px;
+}
+
+.design-chip-menu-date-btn {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  color: #888;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.design-chip-menu-date-btn:hover {
+  border-color: #4d9b99;
+  color: var(--color-heading);
+}
+
+.design-chip-menu-date-input {
+  font-size: 11px;
+  font-family: var(--font-sans);
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 3px 6px;
+  outline: none;
+  color: var(--color-heading);
+  background: #fff;
+  color-scheme: light;
+  flex: 1;
+}
+
+.design-chip-menu-date-input:focus {
+  border-color: #4d9b99;
+}
+
+.design-chip-menu-date-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  font-size: 15px;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.design-chip-menu-date-clear:hover {
+  color: #ce0058;
+}
+
+.design-chip-menu-check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-heading);
+  cursor: pointer;
+  user-select: none;
+}
+
+.design-chip-menu-check-row input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #4d9b99;
+  color-scheme: light;
+  flex-shrink: 0;
 }

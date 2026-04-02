@@ -15,7 +15,8 @@ export function createDefaultPlan(): Plan {
     milestones: [
       {
         id: crypto.randomUUID(),
-        name: 'Intro to Dare to Lead',
+        name: 'Lesson 1',
+        description: 'Intro to Dare to Lead',
         milestoneType: 'chapter',
         optional: false,
         unlockAt: apr1,
@@ -34,7 +35,8 @@ export function createDefaultPlan(): Plan {
       },
       {
         id: crypto.randomUUID(),
-        name: 'The Heart of Dare to Lead',
+        name: 'Lesson 2',
+        description: 'The Heart of Dare to Lead',
         milestoneType: 'chapter',
         optional: false,
         unlockAt: apr8,
@@ -80,7 +82,8 @@ export function createDefaultPlan(): Plan {
       },
       {
         id: crypto.randomUUID(),
-        name: 'Rumbling with Vulnerability',
+        name: 'Lesson 3',
+        description: 'Rumbling with Vulnerability',
         milestoneType: 'chapter',
         optional: true,
         unlockAt: apr22,
