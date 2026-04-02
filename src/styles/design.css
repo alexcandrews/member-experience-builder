@@ -554,14 +554,16 @@
   gap: 4px;
 }
 
+/* Figma: single-row layout — title left, actions right */
 .design-activity-card {
   background: var(--color-bg-secondary);
-  min-height: 80px;
-  padding: 24px;
+  padding: 4px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 40px;
+  min-height: 56px;
+  position: relative;
 }
 
 .design-activity-card:first-child {
@@ -591,6 +593,7 @@
   gap: 16px;
   align-items: center;
   flex-shrink: 0;
+  position: relative;
 }
 
 .design-activity-meta {
@@ -610,9 +613,9 @@
 .design-activity-meta-label {
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.32px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.28px;
   color: var(--color-body);
   white-space: nowrap;
 }
@@ -624,6 +627,7 @@
   opacity: 0.3;
 }
 
+/* Figma: action button — pill shape, 48px height */
 .design-activity-btn {
   background: none;
   border: 1px solid var(--color-btn-border);
@@ -643,6 +647,253 @@
 
 .design-activity-btn:hover {
   background: rgba(29, 25, 37, 0.04);
+}
+
+/* ─── Inline Editing Controls ────────────────────────────────────────────── */
+
+/* Click-to-edit title */
+.design-activity-title--editable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 0.12s;
+}
+
+.design-activity-title--editable:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.design-activity-title-input {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+  color: var(--color-body);
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 2px 8px;
+  background: white;
+  outline: none;
+}
+
+.design-activity-title-input:focus {
+  border-color: var(--color-objective);
+}
+
+/* Click-to-edit type & duration labels */
+.design-activity-meta-label--editable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 4px;
+  margin: -1px -4px;
+  transition: background 0.12s;
+}
+
+.design-activity-meta-label--editable:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Type dropdown (shown on click) */
+.design-activity-type-select {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-body);
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 3px 8px;
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+
+.design-activity-type-select:focus {
+  border-color: var(--color-objective);
+}
+
+/* Duration input (shown on click) */
+.design-activity-duration-input {
+  width: 48px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  text-align: right;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 3px 6px;
+  background: white;
+  outline: none;
+  color: var(--color-body);
+  -moz-appearance: textfield;
+}
+
+.design-activity-duration-input::-webkit-inner-spin-button,
+.design-activity-duration-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.design-activity-duration-input:focus {
+  border-color: var(--color-objective);
+}
+
+.design-activity-duration-suffix {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-body);
+  opacity: 0.5;
+}
+
+/* "+ duration" hint when no duration set */
+.design-activity-duration-add {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  padding: 1px 4px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.design-activity-card:hover .design-activity-duration-add {
+  opacity: 1;
+}
+
+.design-activity-duration-add:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-objective);
+}
+
+/* ─── Three-dot menu + delete ────────────────────────────────────────────── */
+
+.design-activity-card-actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.design-activity-card:hover .design-activity-card-actions {
+  opacity: 1;
+}
+
+.design-activity-menu-btn {
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.12s, background 0.12s;
+}
+
+.design-activity-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-body);
+}
+
+.design-activity-delete-btn {
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.12s, background 0.12s;
+}
+
+.design-activity-delete-btn:hover {
+  color: #ce0058;
+  background: rgba(206, 0, 88, 0.06);
+}
+
+/* ─── Activity menu popover ──────────────────────────────────────────────── */
+
+.design-activity-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 260px;
+}
+
+.design-activity-menu-label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.design-activity-menu-input {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-body);
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: #fafafa;
+  outline: none;
+  width: 100%;
+}
+
+.design-activity-menu-input:focus {
+  border-color: var(--color-objective);
+  background: white;
+}
+
+.design-activity-menu-input::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Add Activity button ────────────────────────────────────────────────── */
+
+.design-activity-add-btn {
+  display: none;
+  background: none;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  color: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 14px 20px;
+  width: 100%;
+  text-align: center;
+  transition: border-color 0.15s, color 0.15s;
+  margin-top: 4px;
+}
+
+.design-plan-items:hover .design-activity-add-btn {
+  display: block;
+}
+
+.design-activity-add-btn--empty {
+  display: block;
+}
+
+.design-activity-add-btn:hover {
+  border-color: var(--color-objective);
+  color: var(--color-objective);
 }
 
 /* ─── Lesson Resources ────────────────────────────────────────────────────── */

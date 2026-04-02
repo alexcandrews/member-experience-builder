@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import type { Plan, Milestone, Activity, MilestoneType, PlanUpdater } from '../../types';
+import type { Plan, Milestone, Activity, ActivityType, MilestoneType, PlanUpdater } from '../../types';
 import { dateToLocalISO, localISOToDate, formatShortDate } from '../../utils/dateHelpers';
 import '../../styles/design.css';
 
@@ -79,6 +79,35 @@ function AssessmentIcon() {
   );
 }
 
+function WorkbookIcon() {
+  return (
+    <svg className="design-activity-meta-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 2h9a1 1 0 011 1v10a1 1 0 01-1 1H3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M3 2v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M6 5.5h4M6 8h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function PdfIcon() {
+  return (
+    <svg className="design-activity-meta-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 1.5h5l3.5 3.5V14a.5.5 0 01-.5.5H4a.5.5 0 01-.5-.5V2a.5.5 0 01.5-.5z" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M9 1.5V5h3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6 9.5h4M6 11.5h2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function AiExperienceIcon() {
+  return (
+    <svg className="design-activity-meta-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 1l1.5 4.5L14 7l-4.5 1.5L8 13l-1.5-4.5L2 7l4.5-1.5L8 1z" fill="currentColor" />
+      <path d="M12.5 2l.5 1.5L14.5 4l-1.5.5L12.5 6l-.5-1.5L10.5 4l1.5-.5L12.5 2z" fill="currentColor" opacity="0.6" />
+    </svg>
+  );
+}
+
 function LockIcon() {
   return (
     <svg className="design-chip-lock-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -102,17 +131,14 @@ function activityTypeInfo(activity: Activity): { label: string; icon: JSX.Elemen
       return { label: 'Video', icon: <VideoIcon /> };
     case 'assessment':
       return { label: 'Assessment', icon: <AssessmentIcon /> };
+    case 'workbook':
+      return { label: 'Workbook', icon: <WorkbookIcon /> };
+    case 'pdf':
+      return { label: 'PDF', icon: <PdfIcon /> };
+    case 'ai_experience':
+      return { label: 'AI Experience', icon: <AiExperienceIcon /> };
     default:
       return { label: 'Activity', icon: <ActivityIcon /> };
-  }
-}
-
-function activityButtonLabel(activity: Activity): string {
-  switch (activity.activityType) {
-    case 'assessment':
-      return 'Start';
-    default:
-      return 'Open';
   }
 }
 
@@ -351,39 +377,220 @@ function MilestoneChip({
   );
 }
 
+const ACTIVITY_TYPE_OPTIONS: { value: ActivityType; label: string }[] = [
+  { value: 'video', label: 'Video' },
+  { value: 'workbook', label: 'Workbook' },
+  { value: 'pdf', label: 'PDF' },
+  { value: 'ai_experience', label: 'AI Experience' },
+  { value: 'assessment', label: 'Assessment' },
+  { value: 'resource', label: 'Resource' },
+];
+
+function activityButtonLabel(activity: Activity): string {
+  switch (activity.activityType) {
+    case 'assessment':
+      return 'Start';
+    case 'pdf':
+    case 'workbook':
+      return 'Download';
+    default:
+      return 'Open';
+  }
+}
+
+function ThreeDotsIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8" cy="3" r="1.5" fill="currentColor" />
+      <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+      <circle cx="8" cy="13" r="1.5" fill="currentColor" />
+    </svg>
+  );
+}
+
 function ActivityCard({
   activity,
   isFirst,
   isLast,
+  isEditingTitle,
+  onStartEditTitle,
+  onStopEditTitle,
+  onUpdate,
+  onDelete,
 }: {
   activity: Activity;
   isFirst: boolean;
   isLast: boolean;
+  isEditingTitle: boolean;
+  onStartEditTitle: () => void;
+  onStopEditTitle: () => void;
+  onUpdate: (updated: Activity) => void;
+  onDelete: () => void;
 }) {
   const { label, icon } = activityTypeInfo(activity);
   const btnLabel = activityButtonLabel(activity);
   const duration = activity.durationSeconds ? formatDuration(activity.durationSeconds) : null;
+
+  const [editingType, setEditingType] = useState(false);
+  const [editingDuration, setEditingDuration] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node) &&
+          menuBtnRef.current && !menuBtnRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
 
   let style: React.CSSProperties = {};
   if (isFirst && isLast) style = { borderRadius: '12px' };
   else if (isFirst) style = { borderRadius: '12px 12px 0 0' };
   else if (isLast) style = { borderRadius: '0 0 12px 12px' };
 
+  const durationMin = activity.durationSeconds ? Math.round(activity.durationSeconds / 60) : '';
+
   return (
     <div className="design-activity-card" style={style}>
-      <span className="design-activity-title">{activity.title}</span>
+      {/* Title */}
+      {isEditingTitle ? (
+        <input
+          className="design-activity-title-input"
+          autoFocus
+          value={activity.title}
+          onChange={(e) => onUpdate({ ...activity, title: e.target.value })}
+          onBlur={onStopEditTitle}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === 'Escape') onStopEditTitle();
+          }}
+        />
+      ) : (
+        <span
+          className="design-activity-title design-activity-title--editable"
+          onClick={onStartEditTitle}
+          title="Click to edit"
+        >
+          {activity.title || 'Untitled activity'}
+        </span>
+      )}
+
+      {/* Actions */}
       <div className="design-activity-actions">
         <div className="design-activity-meta">
           {icon}
-          <span className="design-activity-meta-label">{label}</span>
-          {duration && (
+          {editingType ? (
+            <select
+              className="design-activity-type-select"
+              autoFocus
+              value={activity.activityType}
+              onChange={(e) => {
+                onUpdate({ ...activity, activityType: e.target.value as ActivityType });
+                setEditingType(false);
+              }}
+              onBlur={() => setEditingType(false)}
+            >
+              {ACTIVITY_TYPE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          ) : (
+            <span
+              className="design-activity-meta-label design-activity-meta-label--editable"
+              onClick={() => setEditingType(true)}
+              title="Click to change type"
+            >
+              {label}
+            </span>
+          )}
+          {(duration || editingDuration) && (
             <>
-              <span className="design-activity-meta-sep">•</span>
-              <span className="design-activity-meta-label">{duration}</span>
+              <span className="design-activity-meta-sep">&bull;</span>
+              {editingDuration ? (
+                <>
+                  <input
+                    className="design-activity-duration-input"
+                    type="number"
+                    min={0}
+                    autoFocus
+                    placeholder="—"
+                    value={durationMin}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      onUpdate({ ...activity, durationSeconds: Number.isNaN(v) ? undefined : v * 60 });
+                    }}
+                    onBlur={() => setEditingDuration(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === 'Escape') setEditingDuration(false);
+                    }}
+                  />
+                  <span className="design-activity-duration-suffix">min</span>
+                </>
+              ) : (
+                <span
+                  className="design-activity-meta-label design-activity-meta-label--editable"
+                  onClick={() => setEditingDuration(true)}
+                  title="Click to edit duration"
+                >
+                  {duration}
+                </span>
+              )}
             </>
+          )}
+          {!duration && !editingDuration && (
+            <span
+              className="design-activity-duration-add"
+              onClick={() => setEditingDuration(true)}
+              title="Add duration"
+            >
+              + duration
+            </span>
           )}
         </div>
         <button className="design-activity-btn" type="button">{btnLabel}</button>
+
+        {/* Three-dot menu + delete */}
+        <div className="design-activity-card-actions">
+          <button
+            ref={menuBtnRef}
+            type="button"
+            className="design-activity-menu-btn"
+            aria-label="Activity options"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <ThreeDotsIcon />
+          </button>
+          <button
+            type="button"
+            className="design-activity-delete-btn"
+            aria-label="Remove activity"
+            onClick={onDelete}
+          >×</button>
+        </div>
+
+        {/* Menu popover */}
+        {menuOpen && (
+          <div ref={menuRef} className="design-activity-menu">
+            <label className="design-activity-menu-label">Resource URL</label>
+            <input
+              className="design-activity-menu-input"
+              type="url"
+              autoFocus
+              placeholder="https://…"
+              value={activity.resourceUrl ?? ''}
+              onChange={(e) => onUpdate({ ...activity, resourceUrl: e.target.value || undefined })}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === 'Escape') setMenuOpen(false);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -405,6 +612,7 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
   const [editingName, setEditingName] = useState(false);
   const [editingMilestoneName, setEditingMilestoneName] = useState(false);
   const [editingObjectiveIndex, setEditingObjectiveIndex] = useState<number | null>(null);
+  const [editingActivityIndex, setEditingActivityIndex] = useState<number | null>(null);
 
   const selectedMilestone = plan.milestones.find((m) => m.id === selectedId) ?? firstMilestone;
 
@@ -419,6 +627,46 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
   const objectives = selectedMilestone.objectives?.slice(0, 3) ?? [];
   const activities = selectedMilestone.activities;
   const deadlineStr = formatDate(selectedMilestone.unlockAt);
+
+  const updateActivity = (index: number, updated: Activity) => {
+    updatePlan((prev) => ({
+      ...prev,
+      milestones: prev.milestones.map((m) =>
+        m.id === selectedMilestone.id
+          ? { ...m, activities: m.activities.map((a, i) => (i === index ? updated : a)) }
+          : m
+      ),
+    }));
+  };
+
+  const deleteActivity = (index: number) => {
+    updatePlan((prev) => ({
+      ...prev,
+      milestones: prev.milestones.map((m) =>
+        m.id === selectedMilestone.id
+          ? { ...m, activities: m.activities.filter((_, i) => i !== index) }
+          : m
+      ),
+    }));
+    if (editingActivityIndex === index) setEditingActivityIndex(null);
+  };
+
+  const addActivity = () => {
+    const newActivity: Activity = {
+      id: crypto.randomUUID(),
+      title: 'New activity',
+      activityType: 'video',
+    };
+    updatePlan((prev) => ({
+      ...prev,
+      milestones: prev.milestones.map((m) =>
+        m.id === selectedMilestone.id
+          ? { ...m, activities: [...m.activities, newActivity] }
+          : m
+      ),
+    }));
+    setEditingActivityIndex(activities.length);
+  };
 
   return (
     <div className="design-page">
@@ -653,16 +901,16 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
           )}
 
           {/* Activities */}
-          {activities.length > 0 && (
-            <div className="design-plan-items">
-              {deadlineStr && (
-                <div className="design-deadline-row">
-                  <CalendarIcon />
-                  <span className="design-deadline-text">
-                    Complete lesson activities before&nbsp; {deadlineStr}
-                  </span>
-                </div>
-              )}
+          <div className="design-plan-items">
+            {deadlineStr && (
+              <div className="design-deadline-row">
+                <CalendarIcon />
+                <span className="design-deadline-text">
+                  Complete lesson activities before&nbsp; {deadlineStr}
+                </span>
+              </div>
+            )}
+            {activities.length > 0 && (
               <div className="design-activity-list">
                 {activities.map((activity, i) => (
                   <ActivityCard
@@ -670,11 +918,23 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
                     activity={activity}
                     isFirst={i === 0}
                     isLast={i === activities.length - 1}
+                    isEditingTitle={editingActivityIndex === i}
+                    onStartEditTitle={() => setEditingActivityIndex(i)}
+                    onStopEditTitle={() => setEditingActivityIndex(null)}
+                    onUpdate={(updated) => updateActivity(i, updated)}
+                    onDelete={() => deleteActivity(i)}
                   />
                 ))}
               </div>
-            </div>
-          )}
+            )}
+            <button
+              type="button"
+              className={`design-activity-add-btn${activities.length === 0 ? ' design-activity-add-btn--empty' : ''}`}
+              onClick={addActivity}
+            >
+              + Add Activity
+            </button>
+          </div>
         </div>
       </div>
 

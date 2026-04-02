@@ -5,6 +5,9 @@ const TYPE_ICONS: Record<ActivityType, string> = {
   assessment: '📋',
   video: '▶',
   resource: '📄',
+  workbook: '📓',
+  pdf: '📑',
+  ai_experience: '✨',
 };
 
 interface ActivityRowProps {
@@ -45,6 +48,9 @@ export default function ActivityRow({ activity, onUpdate, onDelete }: ActivityRo
         onChange={(e) => onUpdate({ ...activity, activityType: e.target.value as ActivityType })}
       >
         <option value="video">Video</option>
+        <option value="workbook">Workbook</option>
+        <option value="pdf">PDF</option>
+        <option value="ai_experience">AI Experience</option>
         <option value="assessment">Assessment</option>
         <option value="resource">Resource</option>
       </select>

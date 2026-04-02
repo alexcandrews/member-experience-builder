@@ -27,6 +27,7 @@ interface JsonActivity {
   required_for_milestone_completion: boolean;
   associated_record_uuid: string | null;
   associated_record_type: string | null;
+  resource_url: string | null;
 }
 
 interface JsonObjective {
@@ -138,6 +139,7 @@ function exportActivity(activity: Activity, position: number): JsonActivity {
     required_for_milestone_completion: activity.requiredForMilestoneCompletion ?? false,
     associated_record_uuid: activity.associatedRecordUuid ?? null,
     associated_record_type: activity.associatedRecordType ?? null,
+    resource_url: activity.resourceUrl ?? null,
   };
 }
 
@@ -236,6 +238,7 @@ function importActivity(json: JsonActivity): Activity {
     requiredForMilestoneCompletion: json.required_for_milestone_completion ?? false,
     associatedRecordUuid: json.associated_record_uuid ?? undefined,
     associatedRecordType: json.associated_record_type ?? undefined,
+    resourceUrl: json.resource_url ?? undefined,
   };
 }
 

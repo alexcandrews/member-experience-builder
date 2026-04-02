@@ -6,12 +6,18 @@ const TYPE_ICONS: Record<ActivityType, string> = {
   assessment: '📋',
   video: '▶',
   resource: '📄',
+  workbook: '📓',
+  pdf: '📑',
+  ai_experience: '✨',
 };
 
 const TYPE_LABELS: Record<ActivityType, string> = {
   assessment: 'Assessment',
   video: 'Video',
   resource: 'Download',
+  workbook: 'Workbook',
+  pdf: 'PDF',
+  ai_experience: 'AI Experience',
 };
 
 interface ResourceCardProps {

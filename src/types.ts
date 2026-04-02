@@ -1,4 +1,4 @@
-export type ActivityType = 'assessment' | 'video' | 'resource';
+export type ActivityType = 'assessment' | 'video' | 'resource' | 'workbook' | 'pdf' | 'ai_experience';
 
 export interface Activity {
   id: string;
@@ -8,6 +8,7 @@ export interface Activity {
   associatedRecordUuid?: string;
   associatedRecordType?: string;
   durationSeconds?: number;
+  resourceUrl?: string;
   requiredForMilestoneCompletion?: boolean;
 }
 
