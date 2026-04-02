@@ -5,10 +5,11 @@ import { downloadPlanJSON, parsePlanJSON } from './utils/importExport';
 import Navigation from './components/Navigation';
 import BuilderPage from './components/builder/BuilderPage';
 import SimulatorPage from './components/simulator/SimulatorPage';
+import DesignPage from './components/design/DesignPage';
 import './App.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'builder' | 'simulator'>('builder');
+  const [activeTab, setActiveTab] = useState<'builder' | 'simulator' | 'design'>('builder');
   const [plan, setPlan] = useState<Plan>(createDefaultPlan);
   const [selectedMilestoneId, setSelectedMilestoneId] = useState<string>(
     () => createDefaultPlan().milestones[0].id,
@@ -79,8 +80,10 @@ function App() {
           selectedMilestoneId={validSelectedId}
           onSelectMilestone={setSelectedMilestoneId}
         />
-      ) : (
+      ) : activeTab === 'simulator' ? (
         <SimulatorPage plan={plan} />
+      ) : (
+        <DesignPage plan={plan} />
       )}
     </div>
   );

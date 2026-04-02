@@ -1,6 +1,6 @@
 interface NavigationProps {
-  activeTab: 'builder' | 'simulator';
-  onTabChange: (tab: 'builder' | 'simulator') => void;
+  activeTab: 'builder' | 'simulator' | 'design';
+  onTabChange: (tab: 'builder' | 'simulator' | 'design') => void;
 }
 
 export default function Navigation({ activeTab, onTabChange }: NavigationProps) {
@@ -22,6 +22,12 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
           onClick={() => onTabChange('simulator')}
         >
           Simulator
+        </button>
+        <button
+          className={`nav-tab${activeTab === 'design' ? ' active' : ''}`}
+          onClick={() => onTabChange('design')}
+        >
+          Design
         </button>
       </div>
     </nav>

@@ -1,0 +1,623 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display&display=swap');
+
+/* ─── Design System Tokens ────────────────────────────────────────────────── */
+.design-page {
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+
+  --color-heading: #1d1925;
+  --color-body: #4d4d4d;
+  --color-bg-secondary: #f9f8f8;
+  --color-objective: #007d4d;
+  --color-btn-border: rgba(29, 25, 37, 0.3);
+  --color-white: #ffffff;
+
+  --header-gradient: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(77, 155, 153, 1) 25%,
+    rgba(61, 123, 134, 1) 50%,
+    rgba(44, 91, 115, 1) 75%,
+    rgba(30, 63, 98, 1) 100%
+  );
+}
+
+/* ─── Page Shell ──────────────────────────────────────────────────────────── */
+.design-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #fff;
+  font-family: var(--font-sans);
+  color: var(--color-heading);
+}
+
+/* ─── Active Program (teal header) ───────────────────────────────────────── */
+.design-active-program {
+  background: var(--header-gradient);
+  padding: 40px 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.design-program-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.design-program-heading {
+  display: flex;
+  flex-direction: column;
+  color: var(--color-white);
+}
+
+.design-program-label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.32px;
+}
+
+.design-program-name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 40px;
+  letter-spacing: 0.72px;
+}
+
+.design-facilitator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--color-white);
+}
+
+.design-facilitator-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--color-white);
+}
+
+.design-facilitator-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.design-facilitator-label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.design-facilitator-name {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.28px;
+}
+
+/* ─── Milestone Chips Strip ───────────────────────────────────────────────── */
+.design-plan-map {
+  height: 132px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  scrollbar-width: none;
+}
+
+.design-plan-map::-webkit-scrollbar {
+  display: none;
+}
+
+.design-milestones {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  height: 112px;
+  padding-top: 10px;
+  width: max-content;
+}
+
+.design-chip {
+  border-radius: 12px;
+  padding: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transition: opacity 0.15s;
+}
+
+.design-chip:hover {
+  opacity: 0.9;
+}
+
+.design-chip--completed {
+  background: #404040;
+  width: 234px;
+  color: var(--color-white);
+}
+
+.design-chip--active {
+  background: var(--color-white);
+  width: 360px;
+  padding: 16px 12px;
+  color: var(--color-body);
+}
+
+.design-chip--upcoming {
+  background: rgba(255, 255, 255, 0.75);
+  width: 234px;
+  color: var(--color-body);
+}
+
+.design-chip--session {
+  background: rgba(255, 255, 255, 0.75);
+  width: 234px;
+  color: var(--color-body);
+}
+
+.design-chip--locked {
+  background: rgba(255, 255, 255, 0.75);
+  width: 234px;
+  color: var(--color-body);
+}
+
+.design-chip-label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.design-chip--completed .design-chip-label {
+  color: var(--color-white);
+}
+
+.design-chip-value {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.design-chip-title {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.28px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.design-chip--active .design-chip-title {
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.18px;
+  width: 328px;
+}
+
+.design-chip--completed .design-chip-title {
+  color: var(--color-white);
+}
+
+.design-chip-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.design-chip-meta-text {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.design-chip-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.design-chip-lock-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.design-chip-session-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+/* ─── Lesson Content ──────────────────────────────────────────────────────── */
+.design-lesson-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.design-plan-header {
+  background: var(--color-white);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0px -4px 16px 0px rgba(1, 30, 46, 0.45);
+  padding: 32px 90px;
+  min-height: 96px;
+  display: flex;
+  align-items: baseline;
+}
+
+.design-plan-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 40px;
+  letter-spacing: 0.72px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.design-plan-body {
+  background: var(--color-white);
+  padding: 0 90px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ─── Lesson Objectives ───────────────────────────────────────────────────── */
+.design-objectives {
+  background: var(--color-bg-secondary);
+  border-radius: 16px;
+  padding: 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.design-objectives-heading {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+  letter-spacing: 0.4px;
+  color: var(--color-heading);
+}
+
+.design-objectives-grid {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.design-objective-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.design-objective-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 18px;
+  background: var(--color-objective);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-white);
+  flex-shrink: 0;
+  letter-spacing: 0.48px;
+}
+
+.design-objective-text {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.18px;
+  color: var(--color-body);
+}
+
+/* ─── Plan Items ──────────────────────────────────────────────────────────── */
+.design-plan-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.design-deadline-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.design-deadline-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--color-heading);
+}
+
+.design-deadline-text {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.48px;
+  color: #000;
+}
+
+.design-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.design-activity-card {
+  background: var(--color-bg-secondary);
+  min-height: 80px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.design-activity-card:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.design-activity-card:last-child {
+  border-radius: 0 0 12px 12px;
+}
+
+.design-activity-card:only-child {
+  border-radius: 12px;
+}
+
+.design-activity-title {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+  color: var(--color-body);
+  flex: 1;
+  min-width: 0;
+}
+
+.design-activity-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.design-activity-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.design-activity-meta-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-body);
+  opacity: 0.7;
+}
+
+.design-activity-meta-label {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.32px;
+  color: var(--color-body);
+  white-space: nowrap;
+}
+
+.design-activity-meta-sep {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--color-body);
+  opacity: 0.3;
+}
+
+.design-activity-btn {
+  background: none;
+  border: 1px solid var(--color-btn-border);
+  border-radius: 100px;
+  height: 48px;
+  padding: 0 20px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.32px;
+  color: var(--color-heading);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+
+.design-activity-btn:hover {
+  background: rgba(29, 25, 37, 0.04);
+}
+
+/* ─── Lesson Resources ────────────────────────────────────────────────────── */
+.design-lesson-resources {
+  background: var(--color-bg-secondary);
+  padding: 40px 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.design-resources-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.design-resources-heading {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+  letter-spacing: 0.4px;
+  color: var(--color-heading);
+}
+
+.design-resources-nav {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.design-resources-count {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.32px;
+  color: var(--color-body);
+}
+
+.design-resources-arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 100px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-heading);
+  font-size: 16px;
+  opacity: 0.6;
+}
+
+.design-resources-arrow:hover {
+  opacity: 1;
+  background: rgba(29, 25, 37, 0.06);
+}
+
+.design-resources-carousel {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.design-resources-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.design-resource-card {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.design-resource-image {
+  height: 160px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(52, 170, 169, 0.4), rgba(44, 91, 115, 0.4));
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.design-resource-image-placeholder {
+  font-size: 32px;
+  opacity: 0.4;
+}
+
+.design-resource-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.design-resource-title {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-heading);
+}
+
+.design-resource-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.design-resource-meta-label {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.28px;
+  color: var(--color-body);
+  white-space: nowrap;
+}
+
+.design-resource-meta-sep {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-body);
+  opacity: 0.3;
+}
