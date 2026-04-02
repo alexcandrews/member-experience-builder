@@ -67,6 +67,26 @@
   font-size: 36px;
   line-height: 40px;
   letter-spacing: 0.72px;
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.design-program-name:hover {
+  border-bottom-color: rgba(255, 255, 255, 0.7);
+}
+
+.design-program-name-input {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 40px;
+  letter-spacing: 0.72px;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 400px;
+  max-width: 100%;
 }
 
 .design-facilitator {
@@ -293,6 +313,27 @@
   letter-spacing: 0.72px;
   color: #000;
   white-space: nowrap;
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.25);
+  margin: 0;
+}
+
+.design-plan-title:hover {
+  border-bottom-color: rgba(0, 0, 0, 0.5);
+}
+
+.design-plan-title-input {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 40px;
+  letter-spacing: 0.72px;
+  color: #000;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 500px;
+  max-width: 100%;
 }
 
 .design-plan-body {

@@ -83,7 +83,7 @@ function App() {
       ) : activeTab === 'simulator' ? (
         <SimulatorPage plan={plan} />
       ) : (
-        <DesignPage plan={plan} />
+        <DesignPage plan={plan} updatePlan={setPlan} />
       )}
     </div>
   );

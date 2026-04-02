@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import type { Plan, Milestone, Activity } from '../../types';
+import type { Plan, Milestone, Activity, PlanUpdater } from '../../types';
 import '../../styles/design.css';
 
 interface DesignPageProps {
   plan: Plan;
+  updatePlan: PlanUpdater;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -212,9 +213,11 @@ const PLACEHOLDER_RESOURCES = [
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function DesignPage({ plan }: DesignPageProps) {
+export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
   const firstMilestone = plan.milestones[0];
   const [selectedId, setSelectedId] = useState<string>(firstMilestone?.id ?? '');
+  const [editingName, setEditingName] = useState(false);
+  const [editingMilestoneName, setEditingMilestoneName] = useState(false);
 
   const selectedMilestone = plan.milestones.find((m) => m.id === selectedId) ?? firstMilestone;
 
@@ -237,12 +240,27 @@ export default function DesignPage({ plan }: DesignPageProps) {
         <div className="design-program-heading-row">
           <div className="design-program-heading">
             <span className="design-program-label">Your program in progress</span>
-            <span className="design-program-name">{plan.name}</span>
+            {editingName ? (
+                <input
+                  className="design-program-name-input"
+                  autoFocus
+                  value={plan.name}
+                  onChange={(e) => updatePlan((prev) => ({ ...prev, name: e.target.value }))}
+                  onBlur={() => setEditingName(false)}
+                  onKeyDown={(e) => e.key === 'Enter' && setEditingName(false)}
+                />
+              ) : (
+                <span
+                  className="design-program-name"
+                  onClick={() => setEditingName(true)}
+                  title="Click to edit"
+                >
+                  {plan.name || 'Untitled Plan'}
+                </span>
+              )}
           </div>
           <div className="design-facilitator">
-            <div className="design-facilitator-avatar">
-              {plan.name.charAt(0).toUpperCase()}
-            </div>
+            <div className="design-facilitator-avatar" />
             <div className="design-facilitator-info">
               <span className="design-facilitator-label">Your Facilitator</span>
               <span className="design-facilitator-name">Facilitator</span>
@@ -272,7 +290,29 @@ export default function DesignPage({ plan }: DesignPageProps) {
       {/* ── Lesson Content ── */}
       <div className="design-lesson-content">
         <div className="design-plan-header">
-          <h1 className="design-plan-title">{selectedMilestone.name}</h1>
+          {editingMilestoneName ? (
+            <input
+              className="design-plan-title-input"
+              autoFocus
+              value={selectedMilestone.name}
+              onChange={(e) => updatePlan((prev) => ({
+                ...prev,
+                milestones: prev.milestones.map((m) =>
+                  m.id === selectedMilestone.id ? { ...m, name: e.target.value } : m
+                ),
+              }))}
+              onBlur={() => setEditingMilestoneName(false)}
+              onKeyDown={(e) => e.key === 'Enter' && setEditingMilestoneName(false)}
+            />
+          ) : (
+            <h1
+              className="design-plan-title"
+              onClick={() => setEditingMilestoneName(true)}
+              title="Click to edit"
+            >
+              {selectedMilestone.name}
+            </h1>
+          )}
         </div>
 
         <div className="design-plan-body">
