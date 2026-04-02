@@ -9,10 +9,12 @@ import type {
   Plan,
   Milestone,
   Activity,
+  Resource,
   CommRule,
   CommRuleType,
   MilestoneType,
   ActivityType,
+  ResourceType,
   UnlockStrategy,
 } from '../types';
 
@@ -41,6 +43,14 @@ interface JsonQuote {
   author_image_url: string | null;
 }
 
+interface JsonResource {
+  position: number;
+  title: string;
+  resource_type: string;
+  duration_minutes: number | null;
+  url: string | null;
+}
+
 interface JsonMilestone {
   position: number;
   name: string;
@@ -54,6 +64,7 @@ interface JsonMilestone {
   objectives: JsonObjective[];
   quotes: JsonQuote[];
   activities: JsonActivity[];
+  resources: JsonResource[];
 }
 
 interface JsonCommRule {
@@ -143,6 +154,16 @@ function exportActivity(activity: Activity, position: number): JsonActivity {
   };
 }
 
+function exportResource(resource: Resource, position: number): JsonResource {
+  return {
+    position,
+    title: resource.title,
+    resource_type: resource.resourceType,
+    duration_minutes: resource.durationMinutes ?? null,
+    url: resource.url ?? null,
+  };
+}
+
 function exportMilestone(milestone: Milestone, position: number): JsonMilestone {
   return {
     position,
@@ -164,6 +185,7 @@ function exportMilestone(milestone: Milestone, position: number): JsonMilestone 
       author_image_url: q.authorImageUrl ?? null,
     })),
     activities: milestone.activities.map((a, i) => exportActivity(a, i + 1)),
+    resources: milestone.resources.map((r, i) => exportResource(r, i + 1)),
   };
 }
 
@@ -242,6 +264,16 @@ function importActivity(json: JsonActivity): Activity {
   };
 }
 
+function importResource(json: JsonResource): Resource {
+  return {
+    id: crypto.randomUUID(),
+    title: json.title,
+    resourceType: (json.resource_type as ResourceType) ?? 'pdf',
+    durationMinutes: json.duration_minutes ?? undefined,
+    url: json.url ?? undefined,
+  };
+}
+
 function importMilestone(json: JsonMilestone): Milestone {
   return {
     id: crypto.randomUUID(),
@@ -265,7 +297,9 @@ function importMilestone(json: JsonMilestone): Milestone {
     activities: (json.activities ?? [])
       .sort((a, b) => a.position - b.position)
       .map(importActivity),
-    resources: [],
+    resources: (json.resources ?? [])
+      .sort((a, b) => a.position - b.position)
+      .map(importResource),
   };
 }
 
