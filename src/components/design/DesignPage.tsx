@@ -404,6 +404,7 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
   const [selectedId, setSelectedId] = useState<string>(firstMilestone?.id ?? '');
   const [editingName, setEditingName] = useState(false);
   const [editingMilestoneName, setEditingMilestoneName] = useState(false);
+  const [editingObjectiveIndex, setEditingObjectiveIndex] = useState<number | null>(null);
 
   const selectedMilestone = plan.milestones.find((m) => m.id === selectedId) ?? firstMilestone;
 
@@ -530,6 +531,24 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
               {selectedMilestone.description ?? selectedMilestone.name}
             </h1>
           )}
+          {objectives.length === 0 && (
+            <button
+              type="button"
+              className="design-add-objective-btn"
+              onClick={() =>
+                updatePlan((prev) => ({
+                  ...prev,
+                  milestones: prev.milestones.map((m) =>
+                    m.id === selectedMilestone.id
+                      ? { ...m, objectives: [{ title: 'New objective statement' }] }
+                      : m
+                  ),
+                }))
+              }
+            >
+              + Add Objective
+            </button>
+          )}
         </div>
 
         <div className="design-plan-body">
@@ -556,10 +575,78 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
                 <div className="design-objectives-grid">
                   {objectives.map((obj, i) => (
                     <div key={i} className="design-objective-col">
-                      <div className="design-objective-number">{i + 1}</div>
-                      <p className="design-objective-text">{obj.title}{obj.description ? ` ${obj.description}` : ''}</p>
+                      <div className="design-objective-number-row">
+                        <div className="design-objective-number">{i + 1}</div>
+                        <button
+                          type="button"
+                          className="design-objective-remove-btn"
+                          aria-label="Remove objective"
+                          onClick={() =>
+                            updatePlan((prev) => ({
+                              ...prev,
+                              milestones: prev.milestones.map((m) => {
+                                if (m.id !== selectedMilestone.id) return m;
+                                const next = (m.objectives ?? []).filter((_, idx) => idx !== i);
+                                return { ...m, objectives: next.length ? next : undefined };
+                              }),
+                            }))
+                          }
+                        >×</button>
+                      </div>
+                      {editingObjectiveIndex === i ? (
+                        <textarea
+                          className="design-objective-textarea"
+                          autoFocus
+                          value={obj.title}
+                          onChange={(e) =>
+                            updatePlan((prev) => ({
+                              ...prev,
+                              milestones: prev.milestones.map((m) =>
+                                m.id === selectedMilestone.id
+                                  ? {
+                                      ...m,
+                                      objectives: m.objectives!.map((o, idx) =>
+                                        idx === i ? { ...o, title: e.target.value } : o
+                                      ),
+                                    }
+                                  : m
+                              ),
+                            }))
+                          }
+                          onBlur={() => setEditingObjectiveIndex(null)}
+                          onKeyDown={(e) => e.key === 'Escape' && setEditingObjectiveIndex(null)}
+                        />
+                      ) : (
+                        <p
+                          className="design-objective-text design-objective-text--editable"
+                          onClick={() => setEditingObjectiveIndex(i)}
+                          title="Click to edit"
+                        >
+                          {obj.title}
+                        </p>
+                      )}
                     </div>
                   ))}
+                  {objectives.length < 3 && (
+                    <div className="design-objective-col design-objective-col--add">
+                      <button
+                        type="button"
+                        className="design-objective-add-btn"
+                        onClick={() =>
+                          updatePlan((prev) => ({
+                            ...prev,
+                            milestones: prev.milestones.map((m) =>
+                              m.id === selectedMilestone.id
+                                ? { ...m, objectives: [...(m.objectives ?? []), { title: 'New objective statement' }] }
+                                : m
+                            ),
+                          }))
+                        }
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

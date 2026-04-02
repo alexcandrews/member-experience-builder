@@ -303,7 +303,7 @@
   padding: 32px 90px;
   min-height: 96px;
   display: flex;
-  align-items: baseline;
+  align-items: center;
 }
 
 .design-plan-title {
@@ -335,6 +335,32 @@
   outline: none;
   width: 500px;
   max-width: 100%;
+}
+
+/* ─── Add Objective Button (hover in plan header) ─────────────────────────── */
+.design-add-objective-btn {
+  display: none;
+  margin-left: 16px;
+  align-self: center;
+  background: none;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  color: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 5px 10px;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.design-plan-header:hover .design-add-objective-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.design-add-objective-btn:hover {
+  border-color: #007d4d;
+  color: #007d4d;
 }
 
 .design-plan-body {
@@ -402,6 +428,87 @@
   line-height: 28px;
   letter-spacing: 0.18px;
   color: var(--color-body);
+  margin: 0;
+}
+
+.design-objective-number-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.design-objective-remove-btn {
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s;
+}
+
+.design-objective-col:hover .design-objective-remove-btn {
+  opacity: 1;
+}
+
+.design-objective-remove-btn:hover {
+  color: #ce0058;
+}
+
+.design-objective-text--editable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 0.12s;
+}
+
+.design-objective-text--editable:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.design-objective-textarea {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.18px;
+  color: var(--color-body);
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 4px 6px;
+  background: white;
+  resize: none;
+  min-height: 84px;
+  outline: none;
+}
+
+.design-objective-textarea:focus {
+  border-color: #007d4d;
+}
+
+.design-objective-col--add {
+  justify-content: flex-start;
+  padding-top: 4px;
+}
+
+.design-objective-add-btn {
+  background: none;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  color: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 12px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.design-objective-add-btn:hover {
+  border-color: #007d4d;
+  color: #007d4d;
 }
 
 /* ─── Plan Items ──────────────────────────────────────────────────────────── */

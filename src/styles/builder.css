@@ -610,6 +610,87 @@
   color: #1a747e;
 }
 
+/* ─── Objectives ──────────────────────────────────────────────────────────── */
+.objectives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.objective-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.objective-number {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #007d4d;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.objective-title-input {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 13px;
+  color: #333;
+  background: #fafafa;
+}
+
+.objective-title-input:focus {
+  outline: none;
+  border-color: #1a747e;
+  background: white;
+}
+
+.objective-delete-btn {
+  background: none;
+  border: none;
+  color: #bbb;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.12s;
+}
+
+.objective-delete-btn:hover {
+  color: #ce0058;
+}
+
+.add-objective-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 7px 12px;
+  margin-top: 4px;
+  margin-bottom: 16px;
+  transition: border-color 0.15s, color 0.15s;
+  width: 100%;
+}
+
+.add-objective-btn:hover {
+  border-color: #007d4d;
+  color: #007d4d;
+}
+
 /* ─── Post-session survey ─────────────────────────────────────────────────── */
 .session-survey-section {
   margin-top: 24px;

@@ -31,6 +31,22 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
     onUpdate({ ...milestone, activities: [...milestone.activities, newActivity] });
   };
 
+  const updateObjective = (index: number, title: string) => {
+    const next = [...(milestone.objectives ?? [])];
+    next[index] = { ...next[index], title };
+    onUpdate({ ...milestone, objectives: next });
+  };
+
+  const deleteObjective = (index: number) => {
+    const next = (milestone.objectives ?? []).filter((_, i) => i !== index);
+    onUpdate({ ...milestone, objectives: next.length ? next : undefined });
+  };
+
+  const addObjective = () => {
+    const next = [...(milestone.objectives ?? []), { title: 'New objective statement' }];
+    onUpdate({ ...milestone, objectives: next });
+  };
+
   const activityCount = milestone.activities.length;
   const totalSeconds = milestone.activities.reduce(
     (sum, a) => sum + (a.durationSeconds ?? 0),
@@ -80,6 +96,32 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
           />
         </div>
       )}
+
+      {/* Objectives */}
+      <h3 className="section-heading">Lesson Objectives</h3>
+      {(milestone.objectives?.length ?? 0) > 0 && (
+        <div className="objectives-list">
+          {milestone.objectives!.map((obj, index) => (
+            <div key={index} className="objective-row">
+              <span className="objective-number">{index + 1}</span>
+              <input
+                className="objective-title-input"
+                value={obj.title}
+                onChange={(e) => updateObjective(index, e.target.value)}
+                placeholder="Objective statement"
+              />
+              <button
+                className="objective-delete-btn"
+                onClick={() => deleteObjective(index)}
+                aria-label="Remove objective"
+              >×</button>
+            </div>
+          ))}
+        </div>
+      )}
+      <button className="add-objective-btn" onClick={addObjective}>
+        + Add objective statement
+      </button>
 
       {/* Activities */}
       <h3 className="section-heading">Activities</h3>
