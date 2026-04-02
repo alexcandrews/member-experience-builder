@@ -36,6 +36,7 @@ export default function PlanHeader({
       milestoneType: 'chapter',
       optional: false,
       activities: [],
+      resources: [],
     };
     updatePlan((prev) => ({ ...prev, milestones: [...prev.milestones, newMilestone] }));
     onSelectMilestone(newMilestone.id);

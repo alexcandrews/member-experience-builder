@@ -32,6 +32,13 @@ export function createDefaultPlan(): Plan {
             durationSeconds: 960,
           },
         ],
+        resources: [
+          { id: crypto.randomUUID(), title: 'Dare to Lead Research Summary', resourceType: 'pdf' },
+          { id: crypto.randomUUID(), title: 'The Power of Vulnerability', resourceType: 'video', durationMinutes: 20 },
+          { id: crypto.randomUUID(), title: 'Dare to Lead with Brené Brown', resourceType: 'podcast', durationMinutes: 72 },
+          { id: crypto.randomUUID(), title: 'Rumbling with Vulnerability Guide', resourceType: 'pdf' },
+          { id: crypto.randomUUID(), title: 'Braving Trust Worksheet', resourceType: 'pdf' },
+        ],
       },
       {
         id: crypto.randomUUID(),
@@ -62,6 +69,7 @@ export function createDefaultPlan(): Plan {
             durationSeconds: 300,
           },
         ],
+        resources: [],
       },
       {
         id: crypto.randomUUID(),
@@ -79,6 +87,7 @@ export function createDefaultPlan(): Plan {
             durationSeconds: 300,
           },
         ],
+        resources: [],
       },
       {
         id: crypto.randomUUID(),
@@ -96,6 +105,7 @@ export function createDefaultPlan(): Plan {
             durationSeconds: 720,
           },
         ],
+        resources: [],
       },
     ],
     config: {

@@ -23,6 +23,16 @@ export interface MilestoneQuote {
   authorImageUrl?: string;
 }
 
+export type ResourceType = 'pdf' | 'video' | 'podcast';
+
+export interface Resource {
+  id: string;
+  title: string;
+  resourceType: ResourceType;
+  durationMinutes?: number;
+  url?: string;
+}
+
 export type MilestoneType = 'chapter' | 'session';
 
 export interface Milestone {
@@ -39,6 +49,7 @@ export interface Milestone {
   objectives?: MilestoneObjective[];
   quotes?: MilestoneQuote[];
   activities: Activity[];
+  resources: Resource[];
 }
 
 export type CommRuleType =

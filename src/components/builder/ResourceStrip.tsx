@@ -1,23 +1,17 @@
 import { useState } from 'react';
-import type { Resource, ActivityType } from '../../types';
+import type { Resource, ResourceType } from '../../types';
 import '../../styles/resources.css';
 
-const TYPE_ICONS: Record<ActivityType, string> = {
-  assessment: '📋',
+const TYPE_ICONS: Record<ResourceType, string> = {
+  pdf: '📄',
   video: '▶',
-  resource: '📄',
-  workbook: '📓',
-  pdf: '📑',
-  ai_experience: '✨',
+  podcast: '🎧',
 };
 
-const TYPE_LABELS: Record<ActivityType, string> = {
-  assessment: 'Assessment',
-  video: 'Video',
-  resource: 'Download',
-  workbook: 'Workbook',
+const TYPE_LABELS: Record<ResourceType, string> = {
   pdf: 'PDF',
-  ai_experience: 'AI Experience',
+  video: 'Video',
+  podcast: 'Podcast',
 };
 
 interface ResourceCardProps {
@@ -42,8 +36,8 @@ function ResourceCard({ resource, onUpdate, onDelete }: ResourceCardProps) {
         ×
       </button>
 
-      <div className={`resource-thumbnail-placeholder ${resource.type}`}>
-        {TYPE_ICONS[resource.type]}
+      <div className={`resource-thumbnail-placeholder ${resource.resourceType}`}>
+        {TYPE_ICONS[resource.resourceType]}
       </div>
 
       <div className="resource-card-body">
@@ -64,8 +58,8 @@ function ResourceCard({ resource, onUpdate, onDelete }: ResourceCardProps) {
 
         <div className="resource-type-badge">
           <select
-            value={resource.type}
-            onChange={(e) => onUpdate({ ...resource, type: e.target.value as ActivityType })}
+            value={resource.resourceType}
+            onChange={(e) => onUpdate({ ...resource, resourceType: e.target.value as ResourceType })}
             style={{
               fontSize: 10,
               border: 'none',
@@ -76,9 +70,9 @@ function ResourceCard({ resource, onUpdate, onDelete }: ResourceCardProps) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            <option value="pdf">📄 PDF</option>
             <option value="video">▶ Video</option>
-            <option value="assessment">📋 Assessment</option>
-            <option value="resource">📄 {TYPE_LABELS.resource}</option>
+            <option value="podcast">🎧 Podcast</option>
           </select>
         </div>
       </div>
@@ -108,7 +102,7 @@ export default function ResourceStrip({ resources, onUpdate }: ResourceStripProp
       {
         id: crypto.randomUUID(),
         title: 'New Resource',
-        type: 'resource',
+        resourceType: 'pdf',
       },
     ]);
   };

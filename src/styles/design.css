@@ -975,6 +975,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .design-resource-image {
@@ -1030,13 +1031,232 @@
   opacity: 0.3;
 }
 
-/* ─── Milestone Chip Context Menu ─────────────────────────────────────────── */
+/* Editable title */
+.design-resource-title--editable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
 
-.design-chip-menu-btn {
+.design-resource-title--editable:hover {
+  color: var(--color-objective);
+}
+
+.design-resource-title-input {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-heading);
+  border: none;
+  border-bottom: 1.5px solid var(--color-objective);
+  outline: none;
+  background: transparent;
+  width: 100%;
+  padding: 0;
+}
+
+/* Editable meta labels */
+.design-resource-meta-label--editable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.design-resource-meta-label--editable:hover {
+  color: var(--color-objective);
+}
+
+/* Type select */
+.design-resource-type-select {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  padding: 0 4px;
+  background: #fff;
+  color: var(--color-body);
+  outline: none;
+}
+
+/* Duration input */
+.design-resource-duration-input {
+  width: 48px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 1px 6px;
+  background: white;
+  outline: none;
+  color: var(--color-body);
+}
+
+.design-resource-duration-input:focus {
+  border-color: var(--color-objective);
+}
+
+.design-resource-duration-suffix {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-body);
+  opacity: 0.6;
+}
+
+.design-resource-duration-add {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.design-resource-duration-add:hover {
+  color: var(--color-objective);
+}
+
+/* Card action buttons (hover-reveal) */
+.design-resource-card-actions {
   position: absolute;
   top: 8px;
   right: 8px;
+  display: flex;
+  gap: 4px;
   opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.design-resource-card:hover .design-resource-card-actions {
+  opacity: 1;
+}
+
+.design-resource-menu-btn {
+  background: rgba(0, 0, 0, 0.35);
+  border: none;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.12s;
+}
+
+.design-resource-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.design-resource-delete-btn {
+  background: rgba(0, 0, 0, 0.35);
+  border: none;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.12s;
+}
+
+.design-resource-delete-btn:hover {
+  background: rgba(206, 0, 88, 0.7);
+}
+
+/* URL menu popover */
+.design-resource-menu {
+  position: absolute;
+  top: 170px;
+  right: 0;
+  z-index: 100;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  padding: 12px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-sans);
+}
+
+.design-resource-menu-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.design-resource-menu-input {
+  font-size: 13px;
+  font-family: var(--font-sans);
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 5px 8px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  color: var(--color-heading);
+  background: #fff;
+}
+
+.design-resource-menu-input:focus {
+  border-color: var(--color-objective);
+}
+
+/* Add Resource button (in carousel) */
+.design-resource-add-btn {
+  min-width: 300px;
+  height: 160px;
+  flex-shrink: 0;
+  border: 2px dashed rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  background: none;
+  color: rgba(0, 0, 0, 0.25);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: border-color 0.15s, color 0.15s;
+  font-family: var(--font-sans);
+}
+
+.design-resource-add-btn span {
+  font-size: 13px;
+}
+
+.design-resource-add-btn:hover {
+  border-color: var(--color-objective);
+  color: var(--color-objective);
+}
+
+/* ─── Milestone Chip Context Menu ─────────────────────────────────────────── */
+
+.design-chip-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.design-chip:hover .design-chip-actions {
+  opacity: 1;
+}
+
+.design-chip-menu-btn {
   background: rgba(0, 0, 0, 0.12);
   border: none;
   border-radius: 6px;
@@ -1048,17 +1268,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.15s, background 0.15s;
+  transition: background 0.15s;
   line-height: 1;
   padding: 0;
 }
 
-.design-chip:hover .design-chip-menu-btn {
-  opacity: 1;
-}
-
 .design-chip-menu-btn:hover {
   background: rgba(0, 0, 0, 0.22);
+}
+
+.design-chip-delete-btn {
+  background: rgba(0, 0, 0, 0.12);
+  border: none;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+  padding: 0;
+}
+
+.design-chip-delete-btn:hover {
+  background: rgba(206, 0, 88, 0.25);
+  color: #ce0058;
 }
 
 .design-chip-menu {
@@ -1213,30 +1451,6 @@
   accent-color: #4d9b99;
   color-scheme: light;
   flex-shrink: 0;
-}
-
-.design-chip-menu-row--danger {
-  border-top: 1px solid #f0f0f0;
-  padding-top: 4px;
-  margin-top: 2px;
-}
-
-.design-chip-menu-delete-btn {
-  background: none;
-  border: none;
-  padding: 4px 0;
-  font-size: 13px;
-  font-family: var(--font-sans);
-  color: #ce0058;
-  cursor: pointer;
-  text-align: left;
-  width: 100%;
-  border-radius: 4px;
-  transition: background 0.12s;
-}
-
-.design-chip-menu-delete-btn:hover {
-  background: rgba(206, 0, 88, 0.07);
 }
 
 /* ─── Ghost Add Milestone Pill ───────────────────────────────────────────── */

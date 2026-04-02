@@ -265,6 +265,7 @@ function importMilestone(json: JsonMilestone): Milestone {
     activities: (json.activities ?? [])
       .sort((a, b) => a.position - b.position)
       .map(importActivity),
+    resources: [],
   };
 }
 

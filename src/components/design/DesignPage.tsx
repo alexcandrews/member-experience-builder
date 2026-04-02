@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import type { Plan, Milestone, Activity, ActivityType, MilestoneType, PlanUpdater } from '../../types';
+import type { Plan, Milestone, Activity, ActivityType, Resource, ResourceType, MilestoneType, PlanUpdater } from '../../types';
 import { dateToLocalISO, localISOToDate, formatShortDate } from '../../utils/dateHelpers';
 import '../../styles/design.css';
 
@@ -228,16 +228,26 @@ function MilestoneChip({
         </div>
       )}
 
-      {/* Three-dot menu button — revealed on hover */}
-      <button
-        ref={btnRef}
-        className="design-chip-menu-btn"
-        type="button"
-        aria-label="Milestone options"
-        onClick={openMenu}
-      >
-        ⋯
-      </button>
+      {/* Hover-reveal actions: three-dot menu + delete */}
+      <div className="design-chip-actions">
+        <button
+          ref={btnRef}
+          className="design-chip-menu-btn"
+          type="button"
+          aria-label="Milestone options"
+          onClick={openMenu}
+        >
+          ⋯
+        </button>
+        <button
+          type="button"
+          className="design-chip-delete-btn"
+          aria-label="Delete milestone"
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+        >
+          ×
+        </button>
+      </div>
 
       {/* Floating context menu — portaled to body to escape backdrop-filter containing block */}
       {showMenu && menuPos && createPortal(
@@ -360,16 +370,6 @@ function MilestoneChip({
             </label>
           </div>
 
-          {/* 6. Delete */}
-          <div className="design-chip-menu-row design-chip-menu-row--danger">
-            <button
-              type="button"
-              className="design-chip-menu-delete-btn"
-              onClick={() => { onDelete(); setShowMenu(false); }}
-            >
-              Delete milestone
-            </button>
-          </div>
         </div>,
         document.body,
       )}
@@ -596,13 +596,215 @@ function ActivityCard({
   );
 }
 
-const PLACEHOLDER_RESOURCES = [
-  { title: 'Dare to Lead Research Summary', type: 'PDF' },
-  { title: 'The Power of Vulnerability', type: 'Video', duration: '20 min' },
-  { title: 'Dare to Lead with Brené Brown', type: 'Podcast', duration: '1:11:50' },
-  { title: 'Rumbling with Vulnerability Guide', type: 'PDF' },
-  { title: 'Braving Trust Worksheet', type: 'PDF' },
+// ── Resource helpers ────────────────────────────────────────────────────────
+
+const RESOURCE_TYPE_OPTIONS: { value: ResourceType; label: string }[] = [
+  { value: 'pdf', label: 'PDF' },
+  { value: 'video', label: 'Video' },
+  { value: 'podcast', label: 'Podcast' },
 ];
+
+function resourceTypeIcon(type: ResourceType): string {
+  switch (type) {
+    case 'video': return '▶';
+    case 'podcast': return '🎧';
+    case 'pdf': return '📄';
+  }
+}
+
+function resourceTypeLabel(type: ResourceType): string {
+  return RESOURCE_TYPE_OPTIONS.find((o) => o.value === type)?.label ?? type;
+}
+
+function formatResourceDuration(minutes: number): string {
+  if (minutes >= 60) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? `${h}:${String(m).padStart(2, '0')} hr` : `${h} hr`;
+  }
+  return `${minutes} min`;
+}
+
+function ResourceCard({
+  resource,
+  isEditingTitle,
+  onStartEditTitle,
+  onStopEditTitle,
+  onUpdate,
+  onDelete,
+}: {
+  resource: Resource;
+  isEditingTitle: boolean;
+  onStartEditTitle: () => void;
+  onStopEditTitle: () => void;
+  onUpdate: (updated: Resource) => void;
+  onDelete: () => void;
+}) {
+  const [editingType, setEditingType] = useState(false);
+  const [editingDuration, setEditingDuration] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const duration = resource.durationMinutes ? formatResourceDuration(resource.durationMinutes) : null;
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node) &&
+          menuBtnRef.current && !menuBtnRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
+
+  return (
+    <div className="design-resource-card">
+      <div className="design-resource-image">
+        <span className="design-resource-image-placeholder">
+          {resourceTypeIcon(resource.resourceType)}
+        </span>
+
+        {/* Hover-reveal actions */}
+        <div className="design-resource-card-actions">
+          <button
+            ref={menuBtnRef}
+            type="button"
+            className="design-resource-menu-btn"
+            aria-label="Resource options"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <ThreeDotsIcon />
+          </button>
+          <button
+            type="button"
+            className="design-resource-delete-btn"
+            aria-label="Remove resource"
+            onClick={onDelete}
+          >×</button>
+        </div>
+      </div>
+
+      <div className="design-resource-info">
+        {/* Title: click-to-edit */}
+        {isEditingTitle ? (
+          <input
+            className="design-resource-title-input"
+            autoFocus
+            value={resource.title}
+            onChange={(e) => onUpdate({ ...resource, title: e.target.value })}
+            onBlur={onStopEditTitle}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === 'Escape') onStopEditTitle();
+            }}
+          />
+        ) : (
+          <span
+            className="design-resource-title design-resource-title--editable"
+            onClick={onStartEditTitle}
+            title="Click to edit"
+          >
+            {resource.title || 'Untitled resource'}
+          </span>
+        )}
+
+        <div className="design-resource-meta">
+          {/* Type: click-to-select */}
+          {editingType ? (
+            <select
+              className="design-resource-type-select"
+              autoFocus
+              value={resource.resourceType}
+              onChange={(e) => {
+                onUpdate({ ...resource, resourceType: e.target.value as ResourceType });
+                setEditingType(false);
+              }}
+              onBlur={() => setEditingType(false)}
+            >
+              {RESOURCE_TYPE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          ) : (
+            <span
+              className="design-resource-meta-label design-resource-meta-label--editable"
+              onClick={() => setEditingType(true)}
+              title="Click to change type"
+            >
+              {resourceTypeLabel(resource.resourceType)}
+            </span>
+          )}
+
+          {/* Duration: click-to-edit */}
+          {(duration || editingDuration) && (
+            <>
+              <span className="design-resource-meta-sep">&bull;</span>
+              {editingDuration ? (
+                <>
+                  <input
+                    className="design-resource-duration-input"
+                    type="number"
+                    min={0}
+                    autoFocus
+                    placeholder="—"
+                    value={resource.durationMinutes ?? ''}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      onUpdate({ ...resource, durationMinutes: Number.isNaN(v) ? undefined : v });
+                    }}
+                    onBlur={() => setEditingDuration(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === 'Escape') setEditingDuration(false);
+                    }}
+                  />
+                  <span className="design-resource-duration-suffix">min</span>
+                </>
+              ) : (
+                <span
+                  className="design-resource-meta-label design-resource-meta-label--editable"
+                  onClick={() => setEditingDuration(true)}
+                  title="Click to edit duration"
+                >
+                  {duration}
+                </span>
+              )}
+            </>
+          )}
+          {!duration && !editingDuration && (
+            <span
+              className="design-resource-duration-add"
+              onClick={() => setEditingDuration(true)}
+              title="Add duration"
+            >
+              + duration
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* URL popover */}
+      {menuOpen && (
+        <div ref={menuRef} className="design-resource-menu">
+          <label className="design-resource-menu-label">Resource URL</label>
+          <input
+            className="design-resource-menu-input"
+            type="url"
+            autoFocus
+            placeholder="https://…"
+            value={resource.url ?? ''}
+            onChange={(e) => onUpdate({ ...resource, url: e.target.value || undefined })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === 'Escape') setMenuOpen(false);
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
@@ -613,6 +815,7 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
   const [editingMilestoneName, setEditingMilestoneName] = useState(false);
   const [editingObjectiveIndex, setEditingObjectiveIndex] = useState<number | null>(null);
   const [editingActivityIndex, setEditingActivityIndex] = useState<number | null>(null);
+  const [editingResourceIndex, setEditingResourceIndex] = useState<number | null>(null);
 
   const selectedMilestone = plan.milestones.find((m) => m.id === selectedId) ?? firstMilestone;
 
@@ -626,6 +829,7 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
 
   const objectives = selectedMilestone.objectives?.slice(0, 3) ?? [];
   const activities = selectedMilestone.activities;
+  const resources = selectedMilestone.resources ?? [];
   const deadlineStr = formatDate(selectedMilestone.unlockAt);
 
   const updateActivity = (index: number, updated: Activity) => {
@@ -666,6 +870,46 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
       ),
     }));
     setEditingActivityIndex(activities.length);
+  };
+
+  const updateResource = (index: number, updated: Resource) => {
+    updatePlan((prev) => ({
+      ...prev,
+      milestones: prev.milestones.map((m) =>
+        m.id === selectedMilestone.id
+          ? { ...m, resources: (m.resources ?? []).map((r, i) => (i === index ? updated : r)) }
+          : m
+      ),
+    }));
+  };
+
+  const deleteResource = (index: number) => {
+    updatePlan((prev) => ({
+      ...prev,
+      milestones: prev.milestones.map((m) =>
+        m.id === selectedMilestone.id
+          ? { ...m, resources: (m.resources ?? []).filter((_, i) => i !== index) }
+          : m
+      ),
+    }));
+    if (editingResourceIndex === index) setEditingResourceIndex(null);
+  };
+
+  const addResource = () => {
+    const newResource: Resource = {
+      id: crypto.randomUUID(),
+      title: 'New resource',
+      resourceType: 'pdf',
+    };
+    updatePlan((prev) => ({
+      ...prev,
+      milestones: prev.milestones.map((m) =>
+        m.id === selectedMilestone.id
+          ? { ...m, resources: [...(m.resources ?? []), newResource] }
+          : m
+      ),
+    }));
+    setEditingResourceIndex(resources.length);
   };
 
   return (
@@ -742,6 +986,7 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
                   milestoneType: 'chapter',
                   optional: false,
                   activities: [],
+                  resources: [],
                 };
                 updatePlan((prev) => ({ ...prev, milestones: [...prev.milestones, newMilestone] }));
                 setSelectedId(newMilestone.id);
@@ -943,34 +1188,31 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
         <div className="design-resources-header">
           <span className="design-resources-heading">Resources and downloads</span>
           <div className="design-resources-nav">
-            <span className="design-resources-count">{PLACEHOLDER_RESOURCES.length} items</span>
+            <span className="design-resources-count">{resources.length} items</span>
             <button className="design-resources-arrow" type="button" aria-label="Previous">‹</button>
             <button className="design-resources-arrow" type="button" aria-label="Next">›</button>
           </div>
         </div>
 
         <div className="design-resources-carousel">
-          {PLACEHOLDER_RESOURCES.map((resource, i) => (
-            <div key={i} className="design-resource-card">
-              <div className="design-resource-image">
-                <span className="design-resource-image-placeholder">
-                  {resource.type === 'Video' ? '▶' : resource.type === 'Podcast' ? '🎧' : '📄'}
-                </span>
-              </div>
-              <div className="design-resource-info">
-                <span className="design-resource-title">{resource.title}</span>
-                <div className="design-resource-meta">
-                  <span className="design-resource-meta-label">{resource.type}</span>
-                  {resource.duration && (
-                    <>
-                      <span className="design-resource-meta-sep">•</span>
-                      <span className="design-resource-meta-label">{resource.duration}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+          {resources.map((resource, i) => (
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              isEditingTitle={editingResourceIndex === i}
+              onStartEditTitle={() => setEditingResourceIndex(i)}
+              onStopEditTitle={() => setEditingResourceIndex(null)}
+              onUpdate={(updated) => updateResource(i, updated)}
+              onDelete={() => deleteResource(i)}
+            />
           ))}
+          <button
+            type="button"
+            className="design-resource-add-btn"
+            onClick={addResource}
+          >
+            +<span>Add Resource</span>
+          </button>
         </div>
       </div>
     </div>
