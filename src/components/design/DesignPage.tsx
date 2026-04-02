@@ -124,12 +124,14 @@ function MilestoneChip({
   variant,
   onClick,
   onUpdate,
+  onDelete,
 }: {
   milestone: Milestone;
   index: number;
   variant: ChipVariant;
   onClick: () => void;
   onUpdate: (updated: Milestone) => void;
+  onDelete: () => void;
 }) {
   const label = chipLabel(milestone);
   const activityCount = milestone.activities.length;
@@ -331,6 +333,17 @@ function MilestoneChip({
               Optional
             </label>
           </div>
+
+          {/* 6. Delete */}
+          <div className="design-chip-menu-row design-chip-menu-row--danger">
+            <button
+              type="button"
+              className="design-chip-menu-delete-btn"
+              onClick={() => { onDelete(); setShowMenu(false); }}
+            >
+              Delete milestone
+            </button>
+          </div>
         </div>,
         document.body,
       )}
@@ -459,9 +472,34 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
                       milestones: prev.milestones.map((m) => (m.id === updated.id ? updated : m)),
                     }))
                   }
+                  onDelete={() =>
+                    updatePlan((prev) => {
+                      const remaining = prev.milestones.filter((m) => m.id !== milestone.id);
+                      if (selectedId === milestone.id) setSelectedId(remaining[0]?.id ?? '');
+                      return { ...prev, milestones: remaining };
+                    })
+                  }
                 />
               );
             })}
+            <button
+              className="design-chip design-chip--add"
+              type="button"
+              aria-label="Add milestone"
+              onClick={() => {
+                const newMilestone: Milestone = {
+                  id: crypto.randomUUID(),
+                  name: `Lesson ${plan.milestones.length + 1}`,
+                  milestoneType: 'chapter',
+                  optional: false,
+                  activities: [],
+                };
+                updatePlan((prev) => ({ ...prev, milestones: [...prev.milestones, newMilestone] }));
+                setSelectedId(newMilestone.id);
+              }}
+            >
+              <span className="design-chip-add-icon">+</span>
+            </button>
           </div>
         </div>
       </div>
@@ -497,15 +535,32 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
         <div className="design-plan-body">
           {/* Lesson Objectives */}
           {objectives.length > 0 && (
-            <div className="design-objectives">
-              <span className="design-objectives-heading">Lesson Objectives</span>
-              <div className="design-objectives-grid">
-                {objectives.map((obj, i) => (
-                  <div key={i} className="design-objective-col">
-                    <div className="design-objective-number">{i + 1}</div>
-                    <p className="design-objective-text">{obj.title}{obj.description ? ` ${obj.description}` : ''}</p>
-                  </div>
-                ))}
+            <div className="design-objectives-wrapper">
+              <button
+                type="button"
+                className="design-objectives-dismiss"
+                aria-label="Remove lesson objectives"
+                onClick={() =>
+                  updatePlan((prev) => ({
+                    ...prev,
+                    milestones: prev.milestones.map((m) =>
+                      m.id === selectedMilestone.id ? { ...m, objectives: [] } : m
+                    ),
+                  }))
+                }
+              >
+                ×
+              </button>
+              <div className="design-objectives">
+                <span className="design-objectives-heading">Lesson Objectives</span>
+                <div className="design-objectives-grid">
+                  {objectives.map((obj, i) => (
+                    <div key={i} className="design-objective-col">
+                      <div className="design-objective-number">{i + 1}</div>
+                      <p className="design-objective-text">{obj.title}{obj.description ? ` ${obj.description}` : ''}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}

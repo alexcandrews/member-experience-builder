@@ -9,7 +9,7 @@ import DesignPage from './components/design/DesignPage';
 import './App.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'builder' | 'simulator' | 'design'>('builder');
+  const [activeTab, setActiveTab] = useState<'builder' | 'simulator' | 'design'>('design');
   const [plan, setPlan] = useState<Plan>(createDefaultPlan);
   const [selectedMilestoneId, setSelectedMilestoneId] = useState<string>(
     () => createDefaultPlan().milestones[0].id,

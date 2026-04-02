@@ -848,3 +848,90 @@
   color-scheme: light;
   flex-shrink: 0;
 }
+
+.design-chip-menu-row--danger {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 4px;
+  margin-top: 2px;
+}
+
+.design-chip-menu-delete-btn {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  color: #ce0058;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  border-radius: 4px;
+  transition: background 0.12s;
+}
+
+.design-chip-menu-delete-btn:hover {
+  background: rgba(206, 0, 88, 0.07);
+}
+
+/* ─── Ghost Add Milestone Pill ───────────────────────────────────────────── */
+
+.design-chip--add {
+  width: 80px;
+  height: 80px;
+  background: transparent;
+  border: 2px dashed rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.design-chip--add:hover {
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #fff;
+  opacity: 1;
+}
+
+.design-chip-add-icon {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+/* ─── Lesson Objectives Dismiss ──────────────────────────────────────────── */
+
+.design-objectives-wrapper {
+  position: relative;
+}
+
+.design-objectives-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: #666;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+  z-index: 1;
+}
+
+.design-objectives-wrapper:hover .design-objectives-dismiss {
+  display: flex;
+}
+
+.design-objectives-dismiss:hover {
+  background: rgba(0, 0, 0, 0.16);
+  color: #222;
+}
