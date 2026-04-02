@@ -3,24 +3,15 @@ import type { Plan } from './types';
 import { createDefaultPlan } from './data';
 import { downloadPlanJSON, parsePlanJSON } from './utils/importExport';
 import Navigation from './components/Navigation';
-import BuilderPage from './components/builder/BuilderPage';
 import SimulatorPage from './components/simulator/SimulatorPage';
 import DesignPage from './components/design/DesignPage';
 import './App.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'builder' | 'simulator' | 'design'>('design');
+  const [activeTab, setActiveTab] = useState<'simulator' | 'design'>('design');
   const [plan, setPlan] = useState<Plan>(createDefaultPlan);
-  const [selectedMilestoneId, setSelectedMilestoneId] = useState<string>(
-    () => createDefaultPlan().milestones[0].id,
-  );
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const validSelectedId =
-    plan.milestones.find((m) => m.id === selectedMilestoneId)?.id ??
-    plan.milestones[0]?.id ??
-    '';
 
   const handleExport = () => {
     downloadPlanJSON(plan);
@@ -39,48 +30,33 @@ function App() {
       try {
         const imported = parsePlanJSON(event.target?.result as string);
         setPlan(imported);
-        setSelectedMilestoneId(imported.milestones[0]?.id ?? '');
         setImportError(null);
       } catch (err) {
         setImportError(err instanceof Error ? err.message : 'Invalid JSON file.');
       }
     };
     reader.readAsText(file);
-    // Reset so the same file can be re-imported
     e.target.value = '';
   };
 
   return (
     <div className="app">
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <Navigation
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onImport={handleImportClick}
+        onExport={handleExport}
+        importError={importError}
+      />
 
-      <div className="app-toolbar">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json,application/json"
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-        />
-        <button className="toolbar-btn" onClick={handleImportClick} title="Import a Guided Journey JSON file">
-          ↑ Import JSON
-        </button>
-        <button className="toolbar-btn" onClick={handleExport} title="Export plan as Guided Journey JSON">
-          ↓ Export JSON
-        </button>
-        {importError && (
-          <span className="toolbar-error">{importError}</span>
-        )}
-      </div>
-
-      {activeTab === 'builder' ? (
-        <BuilderPage
-          plan={plan}
-          updatePlan={setPlan}
-          selectedMilestoneId={validSelectedId}
-          onSelectMilestone={setSelectedMilestoneId}
-        />
-      ) : activeTab === 'simulator' ? (
+      {activeTab === 'simulator' ? (
         <SimulatorPage plan={plan} />
       ) : (
         <DesignPage plan={plan} updatePlan={setPlan} />

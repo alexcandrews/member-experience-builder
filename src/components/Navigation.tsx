@@ -1,21 +1,20 @@
 interface NavigationProps {
-  activeTab: 'builder' | 'simulator' | 'design';
-  onTabChange: (tab: 'builder' | 'simulator' | 'design') => void;
+  activeTab: 'simulator' | 'design';
+  onTabChange: (tab: 'simulator' | 'design') => void;
+  onImport: () => void;
+  onExport: () => void;
+  importError?: string | null;
 }
 
-export default function Navigation({ activeTab, onTabChange }: NavigationProps) {
+export default function Navigation({ activeTab, onTabChange, onImport, onExport, importError }: NavigationProps) {
   return (
     <nav className="app-nav">
-      <div className="nav-brand">
-        <span className="nav-brand-icon">✦</span>
-        Journey Builder
-      </div>
       <div className="nav-tabs">
         <button
-          className={`nav-tab${activeTab === 'builder' ? ' active' : ''}`}
-          onClick={() => onTabChange('builder')}
+          className={`nav-tab${activeTab === 'design' ? ' active' : ''}`}
+          onClick={() => onTabChange('design')}
         >
-          Builder
+          Design
         </button>
         <button
           className={`nav-tab${activeTab === 'simulator' ? ' active' : ''}`}
@@ -23,12 +22,17 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
         >
           Simulator
         </button>
-        <button
-          className={`nav-tab${activeTab === 'design' ? ' active' : ''}`}
-          onClick={() => onTabChange('design')}
-        >
-          Design
+      </div>
+      <div className="nav-actions">
+        <button className="toolbar-btn" onClick={onImport} title="Import a Guided Journey JSON file">
+          ↑ Import JSON
         </button>
+        <button className="toolbar-btn" onClick={onExport} title="Export plan as Guided Journey JSON">
+          ↓ Export JSON
+        </button>
+        {importError && (
+          <span className="toolbar-error">{importError}</span>
+        )}
       </div>
     </nav>
   );
