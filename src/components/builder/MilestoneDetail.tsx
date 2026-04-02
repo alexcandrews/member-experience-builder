@@ -98,30 +98,32 @@ export default function MilestoneDetail({ milestone, onUpdate }: MilestoneDetail
       )}
 
       {/* Objectives */}
-      <h3 className="section-heading">Lesson Objectives</h3>
-      {(milestone.objectives?.length ?? 0) > 0 && (
-        <div className="objectives-list">
-          {milestone.objectives!.map((obj, index) => (
-            <div key={index} className="objective-row">
-              <span className="objective-number">{index + 1}</span>
-              <input
-                className="objective-title-input"
-                value={obj.title}
-                onChange={(e) => updateObjective(index, e.target.value)}
-                placeholder="Objective statement"
-              />
-              <button
-                className="objective-delete-btn"
-                onClick={() => deleteObjective(index)}
-                aria-label="Remove objective"
-              >×</button>
-            </div>
-          ))}
-        </div>
-      )}
-      <button className="add-objective-btn" onClick={addObjective}>
-        + Add objective statement
-      </button>
+      <div className="objectives-section">
+        <h3 className="section-heading">Lesson Objectives</h3>
+        {(milestone.objectives?.length ?? 0) > 0 && (
+          <div className="objectives-list">
+            {milestone.objectives!.map((obj, index) => (
+              <div key={index} className="objective-row">
+                <span className="objective-number">{index + 1}</span>
+                <input
+                  className="objective-title-input"
+                  value={obj.title}
+                  onChange={(e) => updateObjective(index, e.target.value)}
+                  placeholder="Objective statement"
+                />
+                <button
+                  className="objective-delete-btn"
+                  onClick={() => deleteObjective(index)}
+                  aria-label="Remove objective"
+                >×</button>
+              </div>
+            ))}
+          </div>
+        )}
+        <button className="add-objective-btn" onClick={addObjective}>
+          + Add objective statement
+        </button>
+      </div>
 
       {/* Activities */}
       <h3 className="section-heading">Activities</h3>

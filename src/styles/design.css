@@ -294,6 +294,7 @@
 .design-lesson-content {
   display: flex;
   flex-direction: column;
+  background: var(--header-gradient);
 }
 
 .design-plan-header {
@@ -491,19 +492,26 @@
 }
 
 .design-objective-col--add {
-  justify-content: flex-start;
-  padding-top: 4px;
+  flex: none;
+  justify-content: center;
+  align-self: center;
 }
 
 .design-objective-add-btn {
+  display: none;
   background: none;
-  border: 1px dashed rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  color: rgba(0, 0, 0, 0.35);
+  border: 1px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  color: rgba(0, 0, 0, 0.4);
   cursor: pointer;
   font-size: 13px;
-  padding: 6px 12px;
+  padding: 6px 16px;
+  white-space: nowrap;
   transition: border-color 0.15s, color 0.15s;
+}
+
+.design-objectives-wrapper:hover .design-objective-add-btn {
+  display: block;
 }
 
 .design-objective-add-btn:hover {
@@ -983,17 +991,21 @@
 /* ─── Ghost Add Milestone Pill ───────────────────────────────────────────── */
 
 .design-chip--add {
-  width: 80px;
-  height: 80px;
+  width: 234px;
+  height: 66px;
   background: transparent;
   border: 2px dashed rgba(255, 255, 255, 0.45);
   color: rgba(255, 255, 255, 0.6);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.design-active-program:hover .design-chip--add {
+  display: flex;
 }
 
 .design-chip--add:hover {
