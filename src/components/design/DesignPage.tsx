@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import type { Plan, Milestone, Activity, ActivityType, Resource, ResourceType, MilestoneType, PlanUpdater } from '../../types';
 import { dateToLocalISO, localISOToDate, formatShortDate } from '../../utils/dateHelpers';
+import PlanSettingsPanel from './PlanSettingsPanel';
 import '../../styles/design.css';
 
 interface DesignPageProps {
@@ -816,6 +817,7 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
   const [editingObjectiveIndex, setEditingObjectiveIndex] = useState<number | null>(null);
   const [editingActivityIndex, setEditingActivityIndex] = useState<number | null>(null);
   const [editingResourceIndex, setEditingResourceIndex] = useState<number | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const selectedMilestone = plan.milestones.find((m) => m.id === selectedId) ?? firstMilestone;
 
@@ -938,13 +940,13 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
                 </span>
               )}
           </div>
-          <div className="design-facilitator">
-            <div className="design-facilitator-avatar" />
-            <div className="design-facilitator-info">
-              <span className="design-facilitator-label">Your Facilitator</span>
-              <span className="design-facilitator-name">Facilitator</span>
-            </div>
-          </div>
+          <button
+            className="design-settings-btn"
+            onClick={() => setSettingsOpen(true)}
+            title="Plan Settings"
+          >
+            ⚙ Plan Settings
+          </button>
         </div>
 
         <div className="design-plan-map">
@@ -1215,6 +1217,16 @@ export default function DesignPage({ plan, updatePlan }: DesignPageProps) {
           </button>
         </div>
       </div>
+
+      {settingsOpen && (
+        <PlanSettingsPanel
+          config={plan.config}
+          onUpdate={(updatedConfig) =>
+            updatePlan((prev) => ({ ...prev, config: updatedConfig }))
+          }
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
     </div>
   );
 }

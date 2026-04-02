@@ -113,13 +113,7 @@ export function createDefaultPlan(): Plan {
       startsAt: apr1,
       communicationsEnabled: true,
       registrationPeriod: { minimumSelection: 1 },
-      commRules: [
-        { id: crypto.randomUUID(), name: 'Start of Plan', triggerType: 'start_of_plan', enabled: true, courierTemplateKey: 'start-of-plan' },
-        { id: crypto.randomUUID(), name: 'End of Plan', triggerType: 'end_of_plan', enabled: true, courierTemplateKey: 'end-of-plan' },
-        { id: crypto.randomUUID(), name: 'Milestone Reminder', triggerType: 'milestone_reminder', enabled: true, triggerOffsetMinutes: 1440, courierTemplateKey: 'milestone-reminder' },
-        { id: crypto.randomUUID(), name: 'Session Reminder', triggerType: 'session_reminder', enabled: true, triggerOffsetMinutes: -1440, courierTemplateKey: 'session-reminder' },
-        { id: crypto.randomUUID(), name: 'Session Follow-up', triggerType: 'session_followup', enabled: false, triggerOffsetMinutes: 1440, courierTemplateKey: 'session-followup' },
-      ],
+      commRules: [],
     },
   };
 }
