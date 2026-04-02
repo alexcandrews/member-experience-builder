@@ -108,7 +108,7 @@
 
 .config-select:focus,
 .config-datetime:focus {
-  border-color: #1a5068;
+  border-color: #1a747e;
 }
 
 .config-divider {
@@ -144,7 +144,7 @@
 .comm-toggle-row input[type='checkbox'] {
   width: 16px;
   height: 16px;
-  accent-color: #1a5068;
+  accent-color: #1a747e;
   cursor: pointer;
 }
 
@@ -176,7 +176,7 @@
 }
 
 .comm-offset-input:focus {
-  border-color: #1a5068;
+  border-color: #1a747e;
 }
 
 .comm-offset-hint {
@@ -196,7 +196,7 @@
 }
 
 .comm-rule-delete:hover {
-  color: #e91e8c;
+  color: #ce0058;
 }
 
 .add-comm-rule-btn {
@@ -215,6 +215,6 @@
 }
 
 .add-comm-rule-btn:hover {
-  border-color: #1a5068;
-  color: #1a5068;
+  border-color: #1a747e;
+  color: #1a747e;
 }

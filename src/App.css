@@ -34,7 +34,7 @@
 }
 
 .nav-brand-icon {
-  color: #e91e8c;
+  color: #ce0058;
   font-size: 16px;
 }
 
@@ -61,8 +61,8 @@
 }
 
 .nav-tab.active {
-  color: #e91e8c;
-  border-bottom-color: #e91e8c;
+  color: #ce0058;
+  border-bottom-color: #ce0058;
 }
 
 /* ─── Toolbar (Import / Export) ───────────────────────────────────────────── */
