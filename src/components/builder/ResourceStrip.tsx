@@ -8,12 +8,6 @@ const TYPE_ICONS: Record<ResourceType, string> = {
   podcast: '🎧',
 };
 
-const TYPE_LABELS: Record<ResourceType, string> = {
-  pdf: 'PDF',
-  video: 'Video',
-  podcast: 'Podcast',
-};
-
 interface ResourceCardProps {
   resource: Resource;
   onUpdate: (updated: Resource) => void;

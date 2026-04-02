@@ -126,7 +126,7 @@ function CalendarIcon() {
   );
 }
 
-function activityTypeInfo(activity: Activity): { label: string; icon: JSX.Element } {
+function activityTypeInfo(activity: Activity): { label: string; icon: React.ReactNode } {
   switch (activity.activityType) {
     case 'video':
       return { label: 'Video', icon: <VideoIcon /> };
@@ -147,7 +147,7 @@ function activityTypeInfo(activity: Activity): { label: string; icon: JSX.Elemen
 
 function MilestoneChip({
   milestone,
-  index,
+  index: _index,
   variant,
   onClick,
   onUpdate,
