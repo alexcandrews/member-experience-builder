@@ -1,4 +1,4 @@
-export type ActivityType = 'assessment' | 'video' | 'resource' | 'workbook' | 'pdf' | 'ai_experience';
+export type ActivityType = 'assessment' | 'video' | 'resource' | 'workbook' | 'pdf' | 'ai_experience' | 'ink';
 
 export interface Activity {
   id: string;

@@ -8,6 +8,7 @@ const TYPE_ICONS: Record<ActivityType, string> = {
   workbook: '📓',
   pdf: '📑',
   ai_experience: '✨',
+  ink: '✏️',
 };
 
 interface ActivityRowProps {
@@ -53,6 +54,7 @@ export default function ActivityRow({ activity, onUpdate, onDelete }: ActivityRo
         <option value="ai_experience">AI Experience</option>
         <option value="assessment">Assessment</option>
         <option value="resource">Resource</option>
+        <option value="ink">Ink / Reflection</option>
       </select>
 
       {editingRecord ? (

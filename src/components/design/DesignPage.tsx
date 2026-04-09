@@ -109,6 +109,15 @@ function AiExperienceIcon() {
   );
 }
 
+function InkIcon() {
+  return (
+    <svg className="design-activity-meta-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.5 2.5l3 3L6 13H3v-3l7.5-7.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M9 4l3 3" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
 function LockIcon() {
   return (
     <svg className="design-chip-lock-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -138,6 +147,8 @@ function activityTypeInfo(activity: Activity): { label: string; icon: React.Reac
       return { label: 'PDF', icon: <PdfIcon /> };
     case 'ai_experience':
       return { label: 'AI Experience', icon: <AiExperienceIcon /> };
+    case 'ink':
+      return { label: 'Ink / Reflection', icon: <InkIcon /> };
     default:
       return { label: 'Activity', icon: <ActivityIcon /> };
   }
@@ -385,6 +396,7 @@ const ACTIVITY_TYPE_OPTIONS: { value: ActivityType; label: string }[] = [
   { value: 'ai_experience', label: 'AI Experience' },
   { value: 'assessment', label: 'Assessment' },
   { value: 'resource', label: 'Resource' },
+  { value: 'ink', label: 'Ink / Reflection' },
 ];
 
 function activityButtonLabel(activity: Activity): string {
@@ -394,6 +406,8 @@ function activityButtonLabel(activity: Activity): string {
     case 'pdf':
     case 'workbook':
       return 'Download';
+    case 'ink':
+      return 'Reflect';
     default:
       return 'Open';
   }

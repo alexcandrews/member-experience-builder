@@ -108,7 +108,6 @@ interface JsonPlan {
 }
 
 export interface GuidedJourneyExport {
-  version: '1.0';
   plan: JsonPlan;
 }
 
@@ -146,7 +145,7 @@ function exportActivity(activity: Activity, position: number): JsonActivity {
     title: activity.title,
     description: activity.description ?? null,
     activity_type: activity.activityType,
-    duration: activity.durationSeconds ?? null,
+    duration: activity.durationSeconds != null ? Math.round(activity.durationSeconds / 60) : null,
     required_for_milestone_completion: activity.requiredForMilestoneCompletion ?? false,
     associated_record_uuid: activity.associatedRecordUuid ?? null,
     associated_record_type: activity.associatedRecordType ?? null,
@@ -202,7 +201,6 @@ function exportCommRule(rule: CommRule): JsonCommRule {
 export function exportPlan(plan: Plan): GuidedJourneyExport {
   const { config } = plan;
   return {
-    version: '1.0',
     plan: {
       internal_name: plan.internalName ?? plan.name,
       name: plan.name,
@@ -256,7 +254,7 @@ function importActivity(json: JsonActivity): Activity {
     title: json.title,
     activityType: (json.activity_type as ActivityType) ?? 'resource',
     description: json.description ?? undefined,
-    durationSeconds: json.duration ?? undefined,
+    durationSeconds: json.duration != null ? json.duration * 60 : undefined,
     requiredForMilestoneCompletion: json.required_for_milestone_completion ?? false,
     associatedRecordUuid: json.associated_record_uuid ?? undefined,
     associatedRecordType: json.associated_record_type ?? undefined,
@@ -351,9 +349,10 @@ export function importPlan(json: GuidedJourneyExport): Plan {
 }
 
 export function parsePlanJSON(jsonString: string): Plan {
-  const parsed = JSON.parse(jsonString) as GuidedJourneyExport;
-  if (!parsed.version || !parsed.plan) {
-    throw new Error('Invalid Guided Journey JSON: missing version or plan fields.');
+  const parsed = JSON.parse(jsonString);
+  const planObj = parsed.plan ?? parsed;
+  if (!planObj || typeof planObj !== 'object' || !planObj.name) {
+    throw new Error('Invalid Guided Journey JSON: expected a "plan" object with at least a "name" field.');
   }
-  return importPlan(parsed);
+  return importPlan({ plan: planObj } as GuidedJourneyExport);
 }
